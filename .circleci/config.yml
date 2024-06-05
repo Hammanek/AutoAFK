@@ -248,7 +248,7 @@ jobs:
       - persist_to_workspace:
           root: "."
           paths:
-            - out
+            - out/make
 
   release:
     docker:
@@ -286,7 +286,7 @@ workflows:
     when:
       equal:
         - << pipeline.git.branch >>
-        - master
+        - fix-release
     jobs:
       - get_scrcpy_server
 
