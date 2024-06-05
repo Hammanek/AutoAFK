@@ -39,14 +39,14 @@ boundaries = {
 
     'collectAfk': (590, 1322, 270, 82),
 
-    'mailLocate': (874, 575, 190, 157),
+    'mailLocate': (915, 515, 150, 150),
     'collectMail': (626, 1518, 305, 102),
     'backMenu': (0, 1720, 150, 200),
 
-    'friends': (880, 754, 178, 168),
+    'friends': (915, 670, 150, 150),
     'sendrecieve': (750, 1560, 306, 100),
 
-    'exitMerc': (912, 360, 129, 108),
+    'exitMerc': (940, 340, 150, 150),
 
     'fastrewards': (872, 1612, 130, 106),
     'closeFR': (266, 1218, 236, 92),
@@ -87,7 +87,7 @@ def collectMail():
         wait()
         # if (pixelCheck(1012, 610, 0) > 240): # We check if the pixel where the notification sits has a red value of higher than 240
         clickXY(960, 630, seconds=2) # Click Mail
-        click('buttons/collect_all', seconds=3, region=boundaries['collectMail'])
+        click('buttons/collect_all')
         clickXY(550, 1600) # Clear any popups
         click('buttons/back', region=boundaries['backMenu'])
         printGreen('    Mail collected!')
@@ -99,7 +99,7 @@ def collectMail():
 def collectCompanionPoints(mercs=False):
     printBlue('Attempting to send/receive companion points')
     if isVisible('buttons/friends', region=boundaries['friends']):
-        if (pixelCheck(1012, 790, 0) > 240):  # We check if the pixel where the notification sits has a red value of higher than 240
+        if (pixelCheck(1020, 688, 0) > 240):  # We check if the pixel where the notification sits has a red value of higher than 240
             clickXY(960, 810)
             click('buttons/sendandreceive', region=boundaries['sendrecieve'])
             if mercs is True:
@@ -212,7 +212,7 @@ def dispatchSoloBounties(remaining=2, maxrefreshes=3):
                 click('buttons/confirm', suppress=True)
                 return
         if refreshes < maxrefreshes:
-            clickXY(90, 250)
+            clickXY(130, 300)
             clickXY(700, 1250)
         refreshes += 1
     printGreen('    ' + str(maxrefreshes) + ' refreshes done, dispatching remaining..')
@@ -242,7 +242,7 @@ def handleArenaOfHeroes(count, opponent, app):
     counter = 0
     printBlue('Battling Arena of Heroes ' + str(count) + ' times')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(740, 1050)
+    clickXY(740, 1100)
     clickXY(550, 50)
     if isVisible('labels/arenaofheroes_new'): # The label font changes for reasons
         click('labels/arenaofheroes_new', suppress=True)
@@ -346,8 +346,8 @@ def collectTSRewards():
 def collectFountainOfTime():
     printBlue('Collecting Fountain of Time')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(800, 700, seconds=6)
-    clickXY(800, 700, seconds=1)
+    clickXY(850, 700, seconds=6)
+    clickXY(850, 700, seconds=1)
     if isVisible('labels/temporalrift'):
         clickXY(550, 1800)
         clickXY(250, 1300)
@@ -590,7 +590,7 @@ def shopPurchases(shoprefreshes,skipQuick=0):
     counter = 0
     confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
     wait(2)
-    clickXY(300, 1725, seconds=5)
+    clickXY(440, 1750, seconds=5)
     if isVisible('labels/store'):
         # First purchases
         handleShopPurchasing(counter)
@@ -613,7 +613,7 @@ def shopPurchases_quick(shoprefreshes):
     counter = 0
     confirmLocation('ranhorn')
     wait(2)
-    clickXY(300, 1725, seconds=5)
+    clickXY(440, 1750, seconds=5)
     if isVisible('labels/store'):
         if isVisible('buttons/quickbuy', click=True):
             wait(1)
