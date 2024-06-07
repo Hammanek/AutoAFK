@@ -316,7 +316,6 @@ def useBagConsumables():
         printError('    Bag not found, attempting to recover')
         recover()
 
-# TODO Get image for the fire debuff banner
 def collectTSRewards():
     printBlue('Collecting Treasure Scramble daily loot')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
@@ -324,7 +323,7 @@ def collectTSRewards():
     clickXY(550, 50) # Clear Arena Tickets
     ts_banners = ['labels/tsbanner_forest', 'labels/tsbanner_ice', 'labels/tsbanner_fog', 'labels/tsbanner_volcano']
     for banner in ts_banners: # Check the 4 debuffs
-        if isVisible(banner, click=True):
+        if isVisible(banner, confidence=0.8, click=True):
             wait(2)
             if isVisible('buttons/ts_path', click=True):
                 clickXY(370, 945) # Choose path
