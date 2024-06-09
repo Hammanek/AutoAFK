@@ -319,7 +319,7 @@ def useBagConsumables():
 def collectTSRewards():
     printBlue('Collecting Treasure Scramble daily loot')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(740, 1050) # open Arena of Heroes
+    clickXY(750, 1100) # Open Arena of Heroes
     clickXY(550, 50) # Clear Arena Tickets
     ts_banners = ['labels/tsbanner_forest', 'labels/tsbanner_ice', 'labels/tsbanner_fog', 'labels/tsbanner_volcano']
     for banner in ts_banners: # Check the 4 debuffs
@@ -358,6 +358,7 @@ def collectFountainOfTime():
         printGreen('    Fountain of Time collected')
     else:
         printError('    Temporal Rift not found, attempting to recover')
+        save_scrcpy_screenshot("rift_notfound")
         recover()
 
 def openTower(name):
