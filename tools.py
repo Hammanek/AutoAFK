@@ -15,7 +15,6 @@ import scrcpy
 import psutil
 import win32gui
 import win32con
-from plyer import notification
 import ctypes
 
 # Configs/settings

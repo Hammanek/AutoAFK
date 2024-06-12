@@ -1,9 +1,7 @@
-from math import ceil
 from tools import *
 from AutoAFK import printGreen, printError, printWarning, printBlue, printPurple, printInfo, settings, pauseOrStopEventCheck
 import datetime
 import shlex
-import time
 
 d = datetime.datetime.now()
 
