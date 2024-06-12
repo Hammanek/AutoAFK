@@ -22,11 +22,8 @@ customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-b
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", metavar="CONFIG", default = "settings.ini", help = "Define alternative settings file to load")
-# parser.add_argument("-a", "--activity", metavar="ACTIVITY", help = "Define Activity")
-# parser.add_argument("-p", "--push", metavar="PUSH", help = "Path to your input image")
 parser.add_argument("-d", "--dailies", action = 'store_true', help = "Run the Dailies function")
 parser.add_argument("-at", "--autotower", action = 'store_true', help = "Run the Auto-Towers function")
-parser.add_argument("-tower", "--tower", choices=['lb', 'lightbearer', 'm', 'mauler', 'w', 'wilder', 'gb', 'graveborn', 'cele', 'celestial', 'hypo', 'hypogean', 'kt', 'kingstower'], help = "Select and run the given tower")
 parser.add_argument("-t", "--test", action = 'store_true', help = "Auto-launch Test server")
 parser.add_argument("-l", "--logging", action = 'store_true', help = "Log output to text file")
 args = vars(parser.parse_args())
@@ -819,8 +816,6 @@ def headlessArgs():
                 wait(3)
                 while 1:
                     towerPusher.pushTower(tower, formation, duration)
-    if args['tower']:
-        print('ok')
 
 def updateSettings():
     with open(settings, 'w') as configfile:
