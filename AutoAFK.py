@@ -1164,6 +1164,13 @@ def printError(text):
         print('ERR' + text)
     writeToLog(text)
 
+    # Save error screenshot
+    words = text.split()
+    result = "_".join(words[:2])
+    current_datetime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    filename = f"error_{result}_{current_datetime}"
+    save_scrcpy_screenshot(filename)
+
 def printGreen(text):
     if args['dailies']:
         print(text)
