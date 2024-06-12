@@ -358,7 +358,6 @@ def collectFountainOfTime():
         printGreen('    Fountain of Time collected')
     else:
         printError('    Temporal Rift not found, attempting to recover')
-        save_scrcpy_screenshot("rift_notfound")
         recover()
 
 def openTower(name):
