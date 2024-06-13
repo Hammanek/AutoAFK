@@ -24,8 +24,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", metavar="CONFIG", default = "settings.ini", help = "Define alternative settings file to load")
 parser.add_argument("-d", "--dailies", action = 'store_true', help = "Run the Dailies function")
 parser.add_argument("-at", "--autotower", action = 'store_true', help = "Run the Auto-Towers function")
-parser.add_argument("-t", "--test", action = 'store_true', help = "Auto-launch Test server")
+parser.add_argument("-ts", "--test", action = 'store_true', help = "Auto-launch Test server")
 parser.add_argument("-l", "--logging", action = 'store_true', help = "Log output to text file")
+parser.add_argument("-t", "--tower", type = str, help = "Select a tower")
 args = vars(parser.parse_args())
 
 if args['config']:
@@ -34,7 +35,7 @@ else:
     settings = os.path.join(cwd, 'settings.ini')
 config.read(settings)
 
-version = "0.18.3"
+version = "0.19"
 
 repo_releases = requests.get('https://api.github.com/repos/Hammanek/AutoAFK/releases/latest')
 json = repo_releases.json() if repo_releases and repo_releases.status_code == 200 else None
@@ -155,10 +156,6 @@ class App(customtkinter.CTk):
         self.textbox.tag_config('yellow', foreground='yellow')
         self.textbox.tag_config('orange', foreground='orange')
         self.textbox.insert('end', 'Welcome to AutoAFK!\n', 'green')
-        #self.textbox.insert('end', 'Github: ', 'purple')
-        #self.textbox.insert('end',  'Github.com/Fortigate/AutoAFK/\n')
-        #self.textbox.insert('end', 'Discord DM: ', 'purple')
-        #self.textbox.insert('end',  'Jc.2\n')
         self.textbox.insert('end', 'Discord chat:\n', 'purple')
         #self.textbox.insert('end', '• afk.hamman.eu/discord in #auto-afk\n', 'purple')
         self.textbox.insert('end', '• dsc.gg/floofpire in #auto-afk\n\n', 'purple')
@@ -188,7 +185,8 @@ class App(customtkinter.CTk):
 
         if (args['config']) != 'settings.ini':
             self.textbox.insert('end', (args['config']) + ' loaded\n\n', 'yellow')
-        if not args['dailies']:
+
+        if not args['dailies'] or not args['tower'] or not args['autotower']:
             sys.stdout = STDOutRedirector(self.textbox)
 
         # Configure windows so we can reference them
@@ -804,18 +802,41 @@ def headlessArgs():
     if args['dailies']:
         dailies()
         sys.exit(0)
+
     if args['autotower']:
         connect_device()
         formation = int(str(config.get('PUSH', 'formation'))[0:1])
         duration = int(config.get('PUSH', 'victoryCheck'))
-        towerdays = {1: 'Lightbearer Tower', 2: 'Mauler Tower', 3: 'Wilder Tower', 4: 'Graveborn Tower', 5: 'Celestial Tower',
-                     6: 'Hypogean Tower', 7: 'King\'s Tower'}
+        towerdays = {
+            1: 'Lightbearer Tower',
+            2: 'Mauler Tower',
+            3: 'Wilder Tower',
+            4: 'Graveborn Tower',
+            5: 'Celestial Tower',
+            6: 'Hypogean Tower',
+            7: "King's Tower"
+        }
         for day, tower in towerdays.items():
             if currenttimeutc.isoweekday() == day:
                 printBlue('Auto-Pushing ' + str(tower) + ' using using the ' + str(config.get('PUSH', 'formation') + ' formation'))
-                wait(3)
-                while 1:
-                    towerPusher.pushTower(tower, formation, duration)
+                towerPusher.pushTower(tower, formation, duration, app=app)
+
+    if args['tower']:
+        connect_device()
+        formation = int(str(config.get('PUSH', 'formation'))[0:1])
+        duration = int(config.get('PUSH', 'victoryCheck'))
+        towers = {
+            "l": 'Lightbearer Tower',
+            "m": 'Mauler Tower',
+            "w": 'Wilder Tower',
+            "g": 'Graveborn Tower',
+            "c": 'Celestial Tower',
+            "h": 'Hypogean Tower',
+            "kt": "King's Tower"
+        }
+        tower = towers[args['tower']]
+        printBlue('Auto-Pushing ' + str(tower) + ' using using the ' + str(config.get('PUSH', 'formation') + ' formation'))
+        towerPusher.pushTower(tower, formation, duration, app=app)
 
 def updateSettings():
     with open(settings, 'w') as configfile:
@@ -1149,56 +1170,3 @@ if __name__ == "__main__":
     setUlockedTowers()
     headlessArgs() # Will launch dailies script before we load the UI if its flagged
     app.mainloop()
-
-def writeToLog(text):
-    if args['logging'] is True:
-        with open((args['config']).split('.')[0] + '.log', 'a') as log:
-            line = '[' + datetime.now().strftime("%d/%m/%y %H:%M:%S") + '] ' + text + '\n'
-            log.write(line)
-
-# Coloured text for the console
-def printError(text):
-    if args['dailies']:
-        print(text)
-    else:
-        print('ERR' + text)
-    writeToLog(text)
-
-    # Save error screenshot
-    #words = text.split()
-    #result = "_".join(words[:2])
-    #current_datetime = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
-    #filename = f"error_{result}_{current_datetime}"
-    #save_scrcpy_screenshot(filename)
-
-def printGreen(text):
-    if args['dailies']:
-        print(text)
-    else:
-        print('GRE' + text)
-    writeToLog(text)
-
-def printWarning(text):
-    if args['dailies']:
-        print(text)
-    else:
-        print('WAR' + text)
-    writeToLog(text)
-
-def printBlue(text):
-    if args['dailies']:
-        print(text)
-    else:
-        print('BLU' + text)
-    writeToLog(text)
-
-def printPurple(text):
-    if args['dailies']:
-        print(text)
-    else:
-        print('PUR' + text)
-    writeToLog(text)
-
-def printInfo(text):
-    print(text,end='')
-    writeToLog(text)

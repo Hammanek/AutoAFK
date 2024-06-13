@@ -4,7 +4,7 @@ import random
 import os
 import numpy as np
 from ppadb.client import Client
-from AutoAFK import printGreen, printError, printWarning, printBlue, printPurple, settings, args
+from AutoAFK import settings, args
 from pyscreeze import locate
 from subprocess import Popen, PIPE
 import time, datetime, os, configparser, sys
@@ -16,6 +16,7 @@ import psutil
 import win32gui
 import win32con
 import ctypes
+from telegram import *
 
 # Configs/settings
 config = configparser.ConfigParser()
@@ -627,3 +628,56 @@ def hide_console():
     hWnd = kernel32.GetConsoleWindow()
     if hWnd:
         user32.ShowWindow(hWnd, SW_HIDE)
+
+def writeToLog(text):
+    if args['logging'] is True:
+        with open((args['config']).split('.')[0] + '.log', 'a') as log:
+            line = '[' + datetime.now().strftime("%d/%m/%y %H:%M:%S") + '] ' + text + '\n'
+            log.write(line)
+
+# Coloured text for the console
+def printError(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('ERR' + text)
+    writeToLog(text)
+
+    # Save error screenshot
+    words = text.split()
+    result = "_".join(words[:2])
+    current_datetime = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    filename = f"error_{result}_{current_datetime}"
+    save_scrcpy_screenshot(filename)
+
+def printGreen(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('GRE' + text)
+    writeToLog(text)
+
+def printWarning(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('WAR' + text)
+    writeToLog(text)
+
+def printBlue(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('BLU' + text)
+    writeToLog(text)
+
+def printPurple(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('PUR' + text)
+    writeToLog(text)
+
+def printInfo(text):
+    print(text,end='')
+    writeToLog(text)

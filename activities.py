@@ -1,5 +1,5 @@
 from tools import *
-from AutoAFK import printGreen, printError, printWarning, printBlue, printPurple, printInfo, settings, pauseOrStopEventCheck
+from AutoAFK import settings, pauseOrStopEventCheck
 import datetime
 import shlex
 
@@ -244,6 +244,7 @@ def handleArenaOfHeroes(count, opponent, app):
     clickXY(550, 50)
     if isVisible('labels/arenaofheroes_new'): # The label font changes for reasons
         click('labels/arenaofheroes_new', suppress=True)
+        wait(1)
         click('buttons/challenge', retry=3, region=boundaries['challengeAoH']) # retries for animated button
         while counter < count:
             wait(1) # To avoid error when clickMultipleChoice returns no results
@@ -379,7 +380,7 @@ class towerPusher():
 
     # Loads selected formation, enables auto-battle and periodically checks for victory
     def pushTower(tower, formation=3, duration=1, app=None):
-        while app.push_thread_running:
+        while app.push_thread_running or args['tower'] or args['autotower']:
             # Open tower is needed then set it to enabled
             if towerPusher.towerOpen is False:
                 openTower(tower)
