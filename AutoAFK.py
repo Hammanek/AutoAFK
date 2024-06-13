@@ -1170,3 +1170,35 @@ if __name__ == "__main__":
     setUlockedTowers()
     headlessArgs() # Will launch dailies script before we load the UI if its flagged
     app.mainloop()
+
+def printWarning(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('WAR' + text)
+    writeToLog(text)
+
+def printGreen(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('GRE' + text)
+    writeToLog(text)
+
+def printBlue(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('BLU' + text)
+    writeToLog(text)
+
+def printPurple(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('PUR' + text)
+    writeToLog(text)
+
+def printInfo(text):
+    print(text,end='')
+    writeToLog(text)
