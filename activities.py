@@ -1,5 +1,5 @@
 from tools import *
-from AutoAFK import settings, pauseOrStopEventCheck, printWarning, printGreen, printBlue, printPurple
+from AutoAFK import settings, pauseOrStopEventCheck, printWarning, printGreen, printBlue, printPurple, printInfo
 import datetime
 import shlex
 
