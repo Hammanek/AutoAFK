@@ -17,7 +17,7 @@ import win32gui
 import win32con
 import ctypes
 from telegram import *
-from AutoAFK import printWarning, printGreen, printBlue
+from AutoAFK import printWarning, printGreen, printBlue, writeToLog
 
 # Configs/settings
 config = configparser.ConfigParser()
@@ -629,12 +629,6 @@ def hide_console():
     hWnd = kernel32.GetConsoleWindow()
     if hWnd:
         user32.ShowWindow(hWnd, SW_HIDE)
-
-def writeToLog(text):
-    if args['logging'] is True:
-        with open((args['config']).split('.')[0] + '.log', 'a') as log:
-            line = '[' + datetime.now().strftime("%d/%m/%y %H:%M:%S") + '] ' + text + '\n'
-            log.write(line)
 
 # Coloured text for the console
 def printError(text):

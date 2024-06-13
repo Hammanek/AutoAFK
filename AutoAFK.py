@@ -1202,3 +1202,9 @@ def printPurple(text):
 def printInfo(text):
     print(text,end='')
     writeToLog(text)
+
+def writeToLog(text):
+    if args['logging'] is True:
+        with open((args['config']).split('.')[0] + '.log', 'a') as log:
+            line = '[' + datetime.now().strftime("%d/%m/%y %H:%M:%S") + '] ' + text + '\n'
+            log.write(line)
