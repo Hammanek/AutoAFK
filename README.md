@@ -6,7 +6,7 @@ While the bot is designed for AFK Arena the core logic will work for anything re
 ![image](https://github.com/Fortigate/AutoAFK/assets/46250387/9879407b-340a-485b-90e3-068e395dca34)
 
 
-Issues/Comments/Suggestions? [Join the Discord server!](https://discord.gg/pfU7UB5A)
+Issues/Comments/Suggestions? [Join the Discord server!](https://dsc.gg/floofpire)
 
 # What does it do?
 In the current release you can select from the following tasks:
