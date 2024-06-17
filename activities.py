@@ -344,8 +344,7 @@ def collectTSRewards():
 def collectFountainOfTime():
     printBlue('Collecting Fountain of Time')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(850, 700, seconds=6)
-    clickXY(850, 700, seconds=1)
+    clickXY(850, 700, seconds=4)
     if isVisible('labels/temporalrift'):
         clickXY(550, 1800)
         clickXY(250, 1300)
