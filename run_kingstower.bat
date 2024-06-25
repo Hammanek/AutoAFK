@@ -1,1 +1,0 @@
-py -3.9 AutoAFK.py --tower kt
