@@ -868,7 +868,7 @@ def handleFightOfFates(battles=3):
         # clear loot
         clickXY(550, 250, seconds=2)
         # Back twice to exit
-        clickXY(70, 1650, seconds=1)
+        clickXY(70, 1810, seconds=1)
         clickXY(70, 1810, seconds=1)
         printGreen('    Fight of Fates attempted successfully')
     else:
