@@ -1063,7 +1063,7 @@ def handleLab():
 
             # If swept completely
             if isVisible('labels/lab_end_flag', retry=3, region=(450, 400, 150, 220), confidence=0.8):
-                printGreen('    Lab Swept1!')
+                printGreen('    Lab Swept!')
                 return
 
             printGreen('    Choosing relics')
