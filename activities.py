@@ -345,6 +345,10 @@ def collectFountainOfTime():
     printBlue('Collecting Fountain of Time')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
     clickXY(850, 700, seconds=4)
+    if isVisible('buttons/collect'):
+        clickXY(550, 1450)
+        clickXY(290, 70)
+        
     if isVisible('labels/temporalrift'):
         clickXY(550, 1800)
         clickXY(250, 1300)
@@ -1049,13 +1053,19 @@ def handleLab():
             clickXY(700, 1250, seconds=6) # Confirm
             clickXY(550, 1600, seconds=3) # Clear Debuff
             # TODO Check Dismal Floor 1 text
-            printGreen('    Sweeping to 2nd Floor')
+            printGreen('    Sweeping floors')
             clickXY(950, 1600, seconds=2) # Level Sweep
             clickXY(550, 1550, seconds=8) # Confirm, long wait for animations
             clickXY(550, 1600, seconds=2) # Clear Resources Exceeded message
             clickXY(550, 1600, seconds=2) # And again for safe measure
             clickXY(550, 1600, seconds=3) # Clear Loot
             clickXY(550, 1250, seconds=5) # Abandon Roamer
+
+            # If swept completely
+            if isVisible('labels/lab_end_flag', retry=3, region=(450, 400, 150, 220), confidence=0.8):
+                printGreen('    Lab Swept1!')
+                return
+
             printGreen('    Choosing relics')
             clickXY(550, 900) # Relic 1
             clickXY(550, 1325, seconds=3) # Choose
