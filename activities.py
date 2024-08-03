@@ -18,7 +18,7 @@ boundaries = {
     'battle': (574, 1779, 300, 110),
     'battleLarge': (310, 1758, 464, 144),
     'formations': (914, 1762, 102, 134),
-    'useAB': (604, 1754, 242, 84),
+    'useAB': (600, 1630, 240, 100),
     'confirmAB': (600, 1220, 250, 100),
     'activateAB': (580, 1208, 300, 150),
     'autobattle0': (575,1020,100,100),
@@ -1060,11 +1060,16 @@ def handleLab():
             clickXY(550, 1600, seconds=2) # And again for safe measure
             clickXY(550, 1600, seconds=3) # Clear Loot
             clickXY(550, 1250, seconds=5) # Abandon Roamer
+            clickXY(530, 1450, seconds=5) # Abandon Roamer #2
+            clickXY(550, 1570, seconds=2) # Adventure complete message
 
             # If swept completely
             if isVisible('labels/lab_end_flag', retry=3, region=(450, 400, 150, 220), confidence=0.8):
                 printGreen('    Lab Swept!')
+                clickXY(50, 1800, seconds=2) # Click Back to Exit
                 return
+            else:
+                save_scrcpy_screenshot("lab")
 
             printGreen('    Choosing relics')
             clickXY(550, 900) # Relic 1
