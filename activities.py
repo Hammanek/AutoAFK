@@ -842,7 +842,6 @@ def handleTwistedRealm():
 def handleFightOfFates(battles=3):
     printBlue('Attempting to run Fight of Fates ' + str(battles) + ' times')
     counter = 0
-    expandMenus() # Expand left menu again as it can shut after other dailies activities
     click('buttons/fightoffates', confidence=0.8, retry=5, seconds=3)
     if isVisible('labels/fightoffates'):
         while counter < battles:
@@ -887,7 +886,6 @@ def handleBattleofBlood(battles=3):
     printBlue('Attempting to run Battle of Blood ' + str(battles) + ' times')
     battlecounter = 0 # Number of battles we want to run
     bob_timeout = 0 # Timer for tracking if something has gone wrong with placing cards
-    expandMenus() # Expand left menu again as it can shut after other dailies activities
     click('buttons/events', confidence=0.8, retry=3, seconds=3)
     if isVisible('labels/battleofblood_event_banner', click=True):
         while battlecounter < battles:
@@ -971,7 +969,6 @@ def handleCircusTour(battles = 3):
     battlecounter = 1
     printBlue('Attempting to run Circus Tour battles')
     confirmLocation('ranhorn', region=boundaries['ranhornSelect']) # Trying to fix 'buttons/events not found' error
-    expandMenus() # Expand left menu again as it can shut after other dailies activities
     click('buttons/events', confidence=0.8, retry=3, seconds=3)
     if isVisible('labels/circustour', retry=3, click=True):
         while battlecounter < battles:
