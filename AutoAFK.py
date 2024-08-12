@@ -35,7 +35,7 @@ else:
     settings = os.path.join(cwd, 'settings.ini')
 config.read(settings)
 
-version = "0.19.3"
+version = "0.19.4"
 
 repo_releases = requests.get('https://api.github.com/repos/Hammanek/AutoAFK/releases/latest')
 json = repo_releases.json() if repo_releases and repo_releases.status_code == 200 else None
@@ -1154,6 +1154,8 @@ class STDOutRedirector(IORedirector):
             self.text_space.insert('end', timestamp + string[3:], 'blue')
         elif entry == 'PUR':
             self.text_space.insert('end', timestamp + string[3:], 'purple')
+        elif entry == 'RED':
+            self.text_space.insert('end', timestamp + string[3:], 'error')
         else:
             self.text_space.insert('end', string)
         self.text_space.see('end')
@@ -1176,6 +1178,13 @@ def printWarning(text):
         print(text)
     else:
         print('WAR' + text)
+    writeToLog(text)
+
+def printRed(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('ERR' + text)
     writeToLog(text)
 
 def printGreen(text):

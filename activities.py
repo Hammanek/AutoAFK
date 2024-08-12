@@ -1,5 +1,5 @@
 from tools import *
-from AutoAFK import settings, pauseOrStopEventCheck, printWarning, printGreen, printBlue, printPurple, printInfo
+from AutoAFK import settings, pauseOrStopEventCheck, printWarning, printGreen, printBlue, printPurple, printInfo, printRed
 import datetime
 import shlex
 
@@ -257,7 +257,7 @@ def handleArenaOfHeroes(count, opponent, app):
                 printGreen('    Battle #' + str(counter+1) + ' Victory!')
                 clickXY(600, 550) # Clear loot popup
             else:
-                printError('    Battle #' + str(counter + 1) + ' Defeat!')
+                printRed('    Battle #' + str(counter + 1) + ' Defeat!')
             clickXY(600, 550)  # Back to opponent selection
             counter = counter+1
             if pauseOrStopEventCheck(app.dailies_pause_event, app.dailies_stop_event):
@@ -942,12 +942,12 @@ def handleBattleofBlood(battles=3):
                 if result is True:
                     printGreen('    Victory! Battle of Blood Battle #' + str(battlecounter) + ' complete')
                 else:
-                    printError('    Defeat! Battle of Blood Battle #' + str(battlecounter) + ' complete')
+                    printRed('    Defeat! Battle of Blood Battle #' + str(battlecounter) + ' complete')
         # Click quests
         wait(2) # wait for animations to settle from exting last battle
         clickXY(150, 230, seconds=2)
         # select dailies tab
-        clickXY(650, 1720, seconds=1)
+        clickXY(650, 1720)
         # Collect Dailies
         clickXY(850, 720, seconds=3)
         clickXY(920, 525, seconds=2)
@@ -955,10 +955,10 @@ def handleBattleofBlood(battles=3):
         # clear loot
         clickXY(550, 250, seconds=2)
         # Back twice to exit
-        clickXY(70, 1810, seconds=1) # Exit Quests
-        clickXY(70, 1810, seconds=1) # Exit BoB
-        clickXY(70, 1810, seconds=1) # Exit Events screen
-        if confirmLocation('ranhorn', bool=True, region=boundaries['ranhornSelect']):
+        clickXY(70, 1810) # Exit Quests
+        clickXY(70, 1810) # Exit BoB
+        clickXY(70, 1810) # Exit Events screen
+        if confirmLocation('ranhorn', bool=True, region=boundaries['ranhornSelect']) or confirmLocation('campaign', bool=True, region=boundaries['campaignSelect']):
             printGreen('    Battle of Blood attempted successfully')
         else:
             printWarning('Issue exiting Battle of Blood, recovering..')
@@ -1465,7 +1465,7 @@ def returnBattleResults(type, firstOfMulti=False):
             printGreen('    Victory!')
             return True
         elif isVisible('labels/defeat', confidence=0.8):
-            printError('    Defeat!')
+            printRed('    Defeat!')
             return False
         else:
             return 'Unknown'
@@ -1502,7 +1502,7 @@ def handleHeroesofEsperia(count=3, opponent=4):
                 if returnBattleResults(type='HoE'):
                     printGreen('    Battle #' + str(counter + 1) + ' Victory!')
                 else:
-                    printError('    Battle #' + str(counter + 1) + ' Defeat!')
+                    printRed('    Battle #' + str(counter + 1) + ' Defeat!')
 
                 # Lots of things/animations can happen after a battle so we keep clicking until we see the fight button again
                 while not isVisible('buttons/fight_hoe', seconds=3, click=True, region=(400, 200, 400, 1500)):
