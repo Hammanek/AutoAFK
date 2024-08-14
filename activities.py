@@ -887,7 +887,18 @@ def handleBattleofBlood(battles=3):
     battlecounter = 0 # Number of battles we want to run
     bob_timeout = 0 # Timer for tracking if something has gone wrong with placing cards
     click('buttons/events', confidence=0.8, retry=3, seconds=3)
-    if isVisible('labels/battleofblood_event_banner', click=True):
+
+    if isVisible('labels/battleofblood_event_banner'):
+        visible=True
+    else:
+        swipe(550, 600, 550, 300, duration=200, seconds=2)
+        if isVisible('labels/battleofblood_event_banner'):
+            visible=True   
+        else:
+            visible=False
+
+    if visible:
+        click('labels/battleofblood_event_banner')
         while battlecounter < battles:
             click('buttons/challenge_tr', confidence=0.8, suppress=True, retry=3, seconds=7)
             # Place cards 1-2, click ready
