@@ -37,7 +37,7 @@ In the current release you can select from the following tasks:
 
 
 # How do I run it?
-Configure your Bluestacks client so that:
+Configure your MuMu Player client so that:
 * ADB is enabled
 * Resolution is 1920x1080
 * DPI is 240

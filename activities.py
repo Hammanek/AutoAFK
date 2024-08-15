@@ -1,9 +1,7 @@
-from math import ceil
 from tools import *
-from AutoAFK import printGreen, printError, printWarning, printBlue, printPurple, printInfo, settings, pauseOrStopEventCheck
+from AutoAFK import settings, pauseOrStopEventCheck, printWarning, printGreen, printBlue, printPurple, printInfo, printRed
 import datetime
 import shlex
-import time
 
 d = datetime.datetime.now()
 
@@ -20,13 +18,13 @@ boundaries = {
     'battle': (574, 1779, 300, 110),
     'battleLarge': (310, 1758, 464, 144),
     'formations': (914, 1762, 102, 134),
-    'useAB': (604, 1754, 242, 84),
-    'confirmAB': (566, 1188, 252, 90),
-    'activateAB': (580, 1208, 272, 86),
-    'autobattle0': (562,994,144,122),
+    'useAB': (600, 1630, 240, 100),
+    'confirmAB': (600, 1220, 250, 100),
+    'activateAB': (580, 1208, 300, 150),
+    'autobattle0': (575,1020,100,100),
     'autobattleLabel': (200, 578, 684, 178),
-    'exitAB': (578, 1250, 290, 88),
-    'cancelAB': (218, 1248, 298, 90),
+    'exitAB': (600, 1270, 300, 100),
+    'cancelAB': (218, 1275, 300, 100),
     'pauseBattle': (24, 1419, 119, 104),
     'exitBattle': (168, 886, 130, 116),
     'tryagain': (478, 892, 128, 120),
@@ -39,14 +37,14 @@ boundaries = {
 
     'collectAfk': (590, 1322, 270, 82),
 
-    'mailLocate': (874, 575, 190, 157),
+    'mailLocate': (915, 515, 150, 150),
     'collectMail': (626, 1518, 305, 102),
     'backMenu': (0, 1720, 150, 200),
 
-    'friends': (880, 754, 178, 168),
+    'friends': (915, 670, 150, 150),
     'sendrecieve': (750, 1560, 306, 100),
 
-    'exitMerc': (912, 360, 129, 108),
+    'exitMerc': (940, 340, 150, 150),
 
     'fastrewards': (872, 1612, 130, 106),
     'closeFR': (266, 1218, 236, 92),
@@ -87,8 +85,10 @@ def collectMail():
         wait()
         # if (pixelCheck(1012, 610, 0) > 240): # We check if the pixel where the notification sits has a red value of higher than 240
         clickXY(960, 630, seconds=2) # Click Mail
-        click('buttons/collect_all', seconds=3, region=boundaries['collectMail'])
+        click('buttons/collect_all')
         clickXY(550, 1600) # Clear any popups
+        clickXY(300, 1600) # Delete messages
+        clickXY(700, 1260) # Confirm
         click('buttons/back', region=boundaries['backMenu'])
         printGreen('    Mail collected!')
         # else:
@@ -99,7 +99,7 @@ def collectMail():
 def collectCompanionPoints(mercs=False):
     printBlue('Attempting to send/receive companion points')
     if isVisible('buttons/friends', region=boundaries['friends']):
-        if (pixelCheck(1012, 790, 0) > 240):  # We check if the pixel where the notification sits has a red value of higher than 240
+        if (pixelCheck(1020, 688, 0) > 240):  # We check if the pixel where the notification sits has a red value of higher than 240
             clickXY(960, 810)
             click('buttons/sendandreceive', region=boundaries['sendrecieve'])
             if mercs is True:
@@ -212,7 +212,7 @@ def dispatchSoloBounties(remaining=2, maxrefreshes=3):
                 click('buttons/confirm', suppress=True)
                 return
         if refreshes < maxrefreshes:
-            clickXY(90, 250)
+            clickXY(130, 300)
             clickXY(700, 1250)
         refreshes += 1
     printGreen('    ' + str(maxrefreshes) + ' refreshes done, dispatching remaining..')
@@ -242,10 +242,11 @@ def handleArenaOfHeroes(count, opponent, app):
     counter = 0
     printBlue('Battling Arena of Heroes ' + str(count) + ' times')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(740, 1050)
+    clickXY(740, 1100)
     clickXY(550, 50)
     if isVisible('labels/arenaofheroes_new'): # The label font changes for reasons
         click('labels/arenaofheroes_new', suppress=True)
+        wait(1)
         click('buttons/challenge', retry=3, region=boundaries['challengeAoH']) # retries for animated button
         while counter < count:
             wait(1) # To avoid error when clickMultipleChoice returns no results
@@ -258,7 +259,7 @@ def handleArenaOfHeroes(count, opponent, app):
                 printGreen('    Battle #' + str(counter+1) + ' Victory!')
                 clickXY(600, 550) # Clear loot popup
             else:
-                printError('    Battle #' + str(counter + 1) + ' Defeat!')
+                printRed('    Battle #' + str(counter + 1) + ' Defeat!')
             clickXY(600, 550)  # Back to opponent selection
             counter = counter+1
             if pauseOrStopEventCheck(app.dailies_pause_event, app.dailies_stop_event):
@@ -316,15 +317,14 @@ def useBagConsumables():
         printError('    Bag not found, attempting to recover')
         recover()
 
-# TODO Get image for the fire debuff banner
 def collectTSRewards():
     printBlue('Collecting Treasure Scramble daily loot')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(740, 1050) # open Arena of Heroes
+    clickXY(750, 1100) # Open Arena of Heroes
     clickXY(550, 50) # Clear Arena Tickets
     ts_banners = ['labels/tsbanner_forest', 'labels/tsbanner_ice', 'labels/tsbanner_fog', 'labels/tsbanner_volcano']
     for banner in ts_banners: # Check the 4 debuffs
-        if isVisible(banner, click=True):
+        if isVisible(banner, confidence=0.8, click=True):
             wait(2)
             if isVisible('buttons/ts_path', click=True):
                 clickXY(370, 945) # Choose path
@@ -346,8 +346,11 @@ def collectTSRewards():
 def collectFountainOfTime():
     printBlue('Collecting Fountain of Time')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(800, 700, seconds=6)
-    clickXY(800, 700, seconds=1)
+    clickXY(850, 700, seconds=4)
+    if isVisible('buttons/collect'):
+        clickXY(550, 1450)
+        clickXY(290, 70)
+        
     if isVisible('labels/temporalrift'):
         clickXY(550, 1800)
         clickXY(250, 1300)
@@ -382,7 +385,7 @@ class towerPusher():
 
     # Loads selected formation, enables auto-battle and periodically checks for victory
     def pushTower(tower, formation=3, duration=1, app=None):
-        while app.push_thread_running:
+        while app.push_thread_running or args['tower'] or args['autotower']:
             # Open tower is needed then set it to enabled
             if towerPusher.towerOpen is False:
                 openTower(tower)
@@ -590,7 +593,7 @@ def shopPurchases(shoprefreshes,skipQuick=0):
     counter = 0
     confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
     wait(2)
-    clickXY(300, 1725, seconds=5)
+    clickXY(440, 1750, seconds=5)
     if isVisible('labels/store'):
         # First purchases
         handleShopPurchasing(counter)
@@ -613,7 +616,7 @@ def shopPurchases_quick(shoprefreshes):
     counter = 0
     confirmLocation('ranhorn')
     wait(2)
-    clickXY(300, 1725, seconds=5)
+    clickXY(440, 1750, seconds=5)
     if isVisible('labels/store'):
         if isVisible('buttons/quickbuy', click=True):
             wait(1)
@@ -841,7 +844,6 @@ def handleTwistedRealm():
 def handleFightOfFates(battles=3):
     printBlue('Attempting to run Fight of Fates ' + str(battles) + ' times')
     counter = 0
-    expandMenus() # Expand left menu again as it can shut after other dailies activities
     click('buttons/fightoffates', confidence=0.8, retry=5, seconds=3)
     if isVisible('labels/fightoffates'):
         while counter < battles:
@@ -871,7 +873,7 @@ def handleFightOfFates(battles=3):
         # clear loot
         clickXY(550, 250, seconds=2)
         # Back twice to exit
-        clickXY(70, 1650, seconds=1)
+        clickXY(70, 1810, seconds=1)
         clickXY(70, 1810, seconds=1)
         printGreen('    Fight of Fates attempted successfully')
     else:
@@ -886,9 +888,19 @@ def handleBattleofBlood(battles=3):
     printBlue('Attempting to run Battle of Blood ' + str(battles) + ' times')
     battlecounter = 0 # Number of battles we want to run
     bob_timeout = 0 # Timer for tracking if something has gone wrong with placing cards
-    expandMenus() # Expand left menu again as it can shut after other dailies activities
     click('buttons/events', confidence=0.8, retry=3, seconds=3)
-    if isVisible('labels/battleofblood_event_banner', click=True):
+
+    if isVisible('labels/battleofblood_event_banner'):
+        visible=True
+    else:
+        swipe(550, 600, 550, 300, duration=200, seconds=2)
+        if isVisible('labels/battleofblood_event_banner'):
+            visible=True   
+        else:
+            visible=False
+
+    if visible:
+        click('labels/battleofblood_event_banner')
         while battlecounter < battles:
             click('buttons/challenge_tr', confidence=0.8, suppress=True, retry=3, seconds=7)
             # Place cards 1-2, click ready
@@ -941,12 +953,12 @@ def handleBattleofBlood(battles=3):
                 if result is True:
                     printGreen('    Victory! Battle of Blood Battle #' + str(battlecounter) + ' complete')
                 else:
-                    printError('    Defeat! Battle of Blood Battle #' + str(battlecounter) + ' complete')
+                    printRed('    Defeat! Battle of Blood Battle #' + str(battlecounter) + ' complete')
         # Click quests
         wait(2) # wait for animations to settle from exting last battle
         clickXY(150, 230, seconds=2)
         # select dailies tab
-        clickXY(650, 1720, seconds=1)
+        clickXY(650, 1720)
         # Collect Dailies
         clickXY(850, 720, seconds=3)
         clickXY(920, 525, seconds=2)
@@ -954,10 +966,10 @@ def handleBattleofBlood(battles=3):
         # clear loot
         clickXY(550, 250, seconds=2)
         # Back twice to exit
-        clickXY(70, 1810, seconds=1) # Exit Quests
-        clickXY(70, 1810, seconds=1) # Exit BoB
-        clickXY(70, 1810, seconds=1) # Exit Events screen
-        if confirmLocation('ranhorn', bool=True, region=boundaries['ranhornSelect']):
+        clickXY(70, 1810) # Exit Quests
+        clickXY(70, 1810) # Exit BoB
+        clickXY(70, 1810) # Exit Events screen
+        if confirmLocation('ranhorn', bool=True, region=boundaries['ranhornSelect']) or confirmLocation('campaign', bool=True, region=boundaries['campaignSelect']):
             printGreen('    Battle of Blood attempted successfully')
         else:
             printWarning('Issue exiting Battle of Blood, recovering..')
@@ -970,7 +982,6 @@ def handleCircusTour(battles = 3):
     battlecounter = 1
     printBlue('Attempting to run Circus Tour battles')
     confirmLocation('ranhorn', region=boundaries['ranhornSelect']) # Trying to fix 'buttons/events not found' error
-    expandMenus() # Expand left menu again as it can shut after other dailies activities
     click('buttons/events', confidence=0.8, retry=3, seconds=3)
     if isVisible('labels/circustour', retry=3, click=True):
         while battlecounter < battles:
@@ -1052,13 +1063,24 @@ def handleLab():
             clickXY(700, 1250, seconds=6) # Confirm
             clickXY(550, 1600, seconds=3) # Clear Debuff
             # TODO Check Dismal Floor 1 text
-            printGreen('    Sweeping to 2nd Floor')
+            printGreen('    Sweeping floors')
             clickXY(950, 1600, seconds=2) # Level Sweep
             clickXY(550, 1550, seconds=8) # Confirm, long wait for animations
             clickXY(550, 1600, seconds=2) # Clear Resources Exceeded message
             clickXY(550, 1600, seconds=2) # And again for safe measure
             clickXY(550, 1600, seconds=3) # Clear Loot
             clickXY(550, 1250, seconds=5) # Abandon Roamer
+            clickXY(530, 1450, seconds=5) # Abandon Roamer #2
+            clickXY(550, 1570, seconds=2) # Adventure complete message
+
+            # If swept completely
+            if isVisible('labels/lab_end_flag', retry=3, region=(450, 400, 150, 220), confidence=0.8):
+                printGreen('    Lab Swept!')
+                clickXY(50, 1800, seconds=2) # Click Back to Exit
+                return
+            else:
+                save_scrcpy_screenshot("lab")
+
             printGreen('    Choosing relics')
             clickXY(550, 900) # Relic 1
             clickXY(550, 1325, seconds=3) # Choose
@@ -1453,7 +1475,7 @@ def returnBattleResults(type, firstOfMulti=False):
             printGreen('    Victory!')
             return True
         elif isVisible('labels/defeat', confidence=0.8):
-            printError('    Defeat!')
+            printRed('    Defeat!')
             return False
         else:
             return 'Unknown'
@@ -1490,7 +1512,7 @@ def handleHeroesofEsperia(count=3, opponent=4):
                 if returnBattleResults(type='HoE'):
                     printGreen('    Battle #' + str(counter + 1) + ' Victory!')
                 else:
-                    printError('    Battle #' + str(counter + 1) + ' Defeat!')
+                    printRed('    Battle #' + str(counter + 1) + ' Defeat!')
 
                 # Lots of things/animations can happen after a battle so we keep clicking until we see the fight button again
                 while not isVisible('buttons/fight_hoe', seconds=3, click=True, region=(400, 200, 400, 1500)):
@@ -1550,3 +1572,17 @@ def afkjourney():
                 printInfo(line)
         process.wait()
         printGreen('AFK Journey dailies done!')  
+
+def levelUp():
+    printBlue('Attempting to level up')
+    confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
+    clickXY(700, 1500, seconds=2) # Resonating crystal
+    clickXY(520, 1860, seconds=2) # Level up
+    clickXY(710, 1260) # Confirm
+    if not isVisible("labels/reso_lvl_progress"):
+        for _ in range(10):
+            clickXY(520, 1860)
+        printGreen('Leveled up successfully') 
+    else: 
+        printWarning("Not enough dust to level up")
+    recover(True)

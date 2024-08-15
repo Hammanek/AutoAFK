@@ -22,13 +22,11 @@ customtkinter.set_default_color_theme("green")  # Themes: blue (default), dark-b
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", metavar="CONFIG", default = "settings.ini", help = "Define alternative settings file to load")
-# parser.add_argument("-a", "--activity", metavar="ACTIVITY", help = "Define Activity")
-# parser.add_argument("-p", "--push", metavar="PUSH", help = "Path to your input image")
 parser.add_argument("-d", "--dailies", action = 'store_true', help = "Run the Dailies function")
 parser.add_argument("-at", "--autotower", action = 'store_true', help = "Run the Auto-Towers function")
-parser.add_argument("-tower", "--tower", choices=['lb', 'lightbearer', 'm', 'mauler', 'w', 'wilder', 'gb', 'graveborn', 'cele', 'celestial', 'hypo', 'hypogean', 'kt', 'kingstower'], help = "Select and run the given tower")
-parser.add_argument("-t", "--test", action = 'store_true', help = "Auto-launch Test server")
+parser.add_argument("-ts", "--test", action = 'store_true', help = "Auto-launch Test server")
 parser.add_argument("-l", "--logging", action = 'store_true', help = "Log output to text file")
+parser.add_argument("-t", "--tower", type = str, help = "Select a tower")
 args = vars(parser.parse_args())
 
 if args['config']:
@@ -37,7 +35,7 @@ else:
     settings = os.path.join(cwd, 'settings.ini')
 config.read(settings)
 
-version = "0.18.2"
+version = "0.19.6"
 
 repo_releases = requests.get('https://api.github.com/repos/Hammanek/AutoAFK/releases/latest')
 json = repo_releases.json() if repo_releases and repo_releases.status_code == 200 else None
@@ -158,10 +156,6 @@ class App(customtkinter.CTk):
         self.textbox.tag_config('yellow', foreground='yellow')
         self.textbox.tag_config('orange', foreground='orange')
         self.textbox.insert('end', 'Welcome to AutoAFK!\n', 'green')
-        #self.textbox.insert('end', 'Github: ', 'purple')
-        #self.textbox.insert('end',  'Github.com/Fortigate/AutoAFK/\n')
-        #self.textbox.insert('end', 'Discord DM: ', 'purple')
-        #self.textbox.insert('end',  'Jc.2\n')
         self.textbox.insert('end', 'Discord chat:\n', 'purple')
         #self.textbox.insert('end', '• afk.hamman.eu/discord in #auto-afk\n', 'purple')
         self.textbox.insert('end', '• dsc.gg/floofpire in #auto-afk\n\n', 'purple')
@@ -191,7 +185,8 @@ class App(customtkinter.CTk):
 
         if (args['config']) != 'settings.ini':
             self.textbox.insert('end', (args['config']) + ' loaded\n\n', 'yellow')
-        if not args['dailies']:
+
+        if not args['dailies'] or not args['tower'] or not args['autotower']:
             sys.stdout = STDOutRedirector(self.textbox)
 
         # Configure windows so we can reference them
@@ -232,12 +227,12 @@ class App(customtkinter.CTk):
 class activityWindow(customtkinter.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.geometry("745x560")
+        self.geometry("745x610")
         self.title('Dailies Configuration')
         self.attributes("-topmost", True)
 
         # Activity Frame
-        self.activityFrame = customtkinter.CTkFrame(master=self, width=235, height=500)
+        self.activityFrame = customtkinter.CTkFrame(master=self, width=235, height=550)
         self.activityFrame.place(x=10, y=10)
         self.label = customtkinter.CTkLabel(master=self.activityFrame, text="Activities:", font=("Arial", 15, 'bold'))
         self.label.place(x=10, y=5)
@@ -330,6 +325,18 @@ class activityWindow(customtkinter.CTkToplevel):
         self.collectMerchantsCheckbox = customtkinter.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
         self.collectMerchantsCheckbox.place(x=200, y=460)
 
+        # Use Bag Comsumables
+        self.useBagConsumablesLabel = customtkinter.CTkLabel(master=self.activityFrame, text='Use Bag Consumables', fg_color=("gray86", "gray17"))
+        self.useBagConsumablesLabel.place(x=10, y=490)
+        self.useBagConsumablesCheckbox = customtkinter.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
+        self.useBagConsumablesCheckbox.place(x=200, y=490)
+
+        # Auto Level Up
+        self.levelUpLabel = customtkinter.CTkLabel(master=self.activityFrame, text='Auto Level Up', fg_color=("gray86", "gray17"))
+        self.levelUpLabel.place(x=10, y=520)
+        self.levelUpCheckbox = customtkinter.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
+        self.levelUpCheckbox.place(x=200, y=520)
+
 
         # Arena Frame
         self.ArenaFrame = customtkinter.CTkFrame(master=self, width=235, height=280)
@@ -366,7 +373,7 @@ class activityWindow(customtkinter.CTkToplevel):
         self.gladiatorCollectCheckbox.place(x=200, y=160)
 
         # Events Frame
-        self.eventsFrame = customtkinter.CTkFrame(master=self, width=235, height=210)
+        self.eventsFrame = customtkinter.CTkFrame(master=self, width=235, height=260)
         self.eventsFrame.place(x=255, y=300)
         self.label = customtkinter.CTkLabel(master=self.eventsFrame, text="Events:", font=("Arial", 15, 'bold'))
         self.label.place(x=10, y=5)
@@ -449,40 +456,34 @@ class activityWindow(customtkinter.CTkToplevel):
         self.dispatchEventBountiesCheckbox.place(x=200, y=280)
 
         # Misc Frame
-        self.MiscFrame = customtkinter.CTkFrame(master=self, width=235, height=180)
+        self.MiscFrame = customtkinter.CTkFrame(master=self, width=235, height=230)
         self.MiscFrame.place(x=500, y=330)
         self.label = customtkinter.CTkLabel(master=self.MiscFrame, text="Misc:", font=("Arial", 15, 'bold'))
         self.label.place(x=10, y=5)
 
-        # Use Bag Comsumables
-        self.useBagConsumablesLabel = customtkinter.CTkLabel(master=self.MiscFrame, text='Use Bag Consumables', fg_color=("gray86", "gray17"))
-        self.useBagConsumablesLabel.place(x=10, y=40)
-        self.useBagConsumablesCheckbox = customtkinter.CTkCheckBox(master=self.MiscFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
-        self.useBagConsumablesCheckbox.place(x=200, y=40)
-
         # Delayed start
         self.delayedStartLabel = customtkinter.CTkLabel(master=self.MiscFrame, text='Delay start by x minutes', fg_color=("gray86", "gray17"))
-        self.delayedStartLabel.place(x=10, y=70)
+        self.delayedStartLabel.place(x=10, y=40)
         self.delayedStartEntry = customtkinter.CTkEntry(master=self.MiscFrame, height=20, width=25)
         self.delayedStartEntry.insert('end', config.get('DAILIES', 'delayedstart'))
-        self.delayedStartEntry.place(x=200, y=70)
+        self.delayedStartEntry.place(x=200, y=40)
 
         # Hibernate system
         self.hibernateLabel = customtkinter.CTkLabel(master=self.MiscFrame, text='Hibernate system when done', fg_color=("gray86", "gray17"))
-        self.hibernateLabel.place(x=10, y=100)
+        self.hibernateLabel.place(x=10, y=70)
         self.hibernateCheckbox = customtkinter.CTkCheckBox(master=self.MiscFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
-        self.hibernateCheckbox.place(x=200, y=100)
+        self.hibernateCheckbox.place(x=200, y=70)
 
         # Save button
         self.activitySaveButton = customtkinter.CTkButton(master=self, text="Save", fg_color=["#3B8ED0", "#1F6AA5"], width=120, command=self.activitySave)
-        self.activitySaveButton.place(x=320, y=520)
+        self.activitySaveButton.place(x=320, y=570)
 
         activityBoxes = ['collectRewards', 'collectMail', 'companionPoints', 'lendMercs', 'attemptCampaign', 'gladiatorCollect',
                          'fountainOfTime', 'kingsTower', 'collectInn', 'guildHunt', 'storePurchases', 'twistedRealm',
                          'collectQuests', 'collectMerchants', 'fightOfFates', 'battleOfBlood', 'circusTour', 'dispatchDust',
                          'dispatchDiamonds', 'dispatchShards', 'dispatchJuice', 'runLab', 'battleArena', 'tsCollect',
                          'useBagConsumables', 'heroesOfEsperia', 'dispatchSoloBounties', 'dispatchTeamBounties', 'hibernate',
-                         'dispatchEventBounties']
+                         'dispatchEventBounties','levelUp']
         for activity in activityBoxes:
             if activity[0:8] == 'dispatch':
                 if config.getboolean('BOUNTIES', activity):
@@ -503,7 +504,7 @@ class activityWindow(customtkinter.CTkToplevel):
                          'collectQuests', 'collectMerchants', 'fightOfFates', 'battleOfBlood', 'circusTour', 'dispatchDust',
                          'dispatchDiamonds', 'dispatchShards', 'dispatchJuice', 'runLab', 'battleArena', 'tsCollect',
                          'useBagConsumables', 'heroesOfEsperia', 'dispatchSoloBounties', 'dispatchTeamBounties', 'hibernate',
-                         'dispatchEventBounties']
+                         'dispatchEventBounties','levelUp']
         for activity in activityBoxes:
             if activity[0:8] == 'dispatch':
                 if self.__getattribute__(activity + 'Checkbox').get() == 1:
@@ -807,20 +808,41 @@ def headlessArgs():
     if args['dailies']:
         dailies()
         sys.exit(0)
+
     if args['autotower']:
         connect_device()
         formation = int(str(config.get('PUSH', 'formation'))[0:1])
         duration = int(config.get('PUSH', 'victoryCheck'))
-        towerdays = {1: 'Lightbearer Tower', 2: 'Mauler Tower', 3: 'Wilder Tower', 4: 'Graveborn Tower', 5: 'Celestial Tower',
-                     6: 'Hypogean Tower', 7: 'King\'s Tower'}
+        towerdays = {
+            1: 'Lightbearer Tower',
+            2: 'Mauler Tower',
+            3: 'Wilder Tower',
+            4: 'Graveborn Tower',
+            5: 'Celestial Tower',
+            6: 'Hypogean Tower',
+            7: "King's Tower"
+        }
         for day, tower in towerdays.items():
             if currenttimeutc.isoweekday() == day:
                 printBlue('Auto-Pushing ' + str(tower) + ' using using the ' + str(config.get('PUSH', 'formation') + ' formation'))
-                wait(3)
-                while 1:
-                    towerPusher.pushTower(tower, formation, duration)
+                towerPusher.pushTower(tower, formation, duration, app=app)
+
     if args['tower']:
-        print('ok')
+        connect_device()
+        formation = int(str(config.get('PUSH', 'formation'))[0:1])
+        duration = int(config.get('PUSH', 'victoryCheck'))
+        towers = {
+            "l": 'Lightbearer Tower',
+            "m": 'Mauler Tower',
+            "w": 'Wilder Tower',
+            "g": 'Graveborn Tower',
+            "c": 'Celestial Tower',
+            "h": 'Hypogean Tower',
+            "kt": "King's Tower"
+        }
+        tower = towers[args['tower']]
+        printBlue('Auto-Pushing ' + str(tower) + ' using using the ' + str(config.get('PUSH', 'formation') + ' formation'))
+        towerPusher.pushTower(tower, formation, duration, app=app)
 
 def updateSettings():
     with open(settings, 'w') as configfile:
@@ -1138,6 +1160,8 @@ class STDOutRedirector(IORedirector):
             self.text_space.insert('end', timestamp + string[3:], 'blue')
         elif entry == 'PUR':
             self.text_space.insert('end', timestamp + string[3:], 'purple')
+        elif entry == 'RED':
+            self.text_space.insert('end', timestamp + string[3:], 'error')
         else:
             self.text_space.insert('end', string)
         self.text_space.see('end')
@@ -1155,14 +1179,14 @@ if __name__ == "__main__":
     headlessArgs() # Will launch dailies script before we load the UI if its flagged
     app.mainloop()
 
-def writeToLog(text):
-    if args['logging'] is True:
-        with open((args['config']).split('.')[0] + '.log', 'a') as log:
-            line = '[' + datetime.now().strftime("%d/%m/%y %H:%M:%S") + '] ' + text + '\n'
-            log.write(line)
+def printWarning(text):
+    if args['dailies']:
+        print(text)
+    else:
+        print('WAR' + text)
+    writeToLog(text)
 
-# Coloured text for the console
-def printError(text):
+def printRed(text):
     if args['dailies']:
         print(text)
     else:
@@ -1174,13 +1198,6 @@ def printGreen(text):
         print(text)
     else:
         print('GRE' + text)
-    writeToLog(text)
-
-def printWarning(text):
-    if args['dailies']:
-        print(text)
-    else:
-        print('WAR' + text)
     writeToLog(text)
 
 def printBlue(text):
@@ -1200,3 +1217,9 @@ def printPurple(text):
 def printInfo(text):
     print(text,end='')
     writeToLog(text)
+
+def writeToLog(text):
+    if args['logging'] is True:
+        with open((args['config']).split('.')[0] + '.log', 'a') as log:
+            line = '[' + datetime.now().strftime("%d/%m/%y %H:%M:%S") + '] ' + text + '\n'
+            log.write(line)
