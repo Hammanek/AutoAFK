@@ -87,6 +87,8 @@ def collectMail():
         clickXY(960, 630, seconds=2) # Click Mail
         click('buttons/collect_all')
         clickXY(550, 1600) # Clear any popups
+        clickXY(300, 1600) # Delete messages
+        clickXY(700, 1260) # Confirm
         click('buttons/back', region=boundaries['backMenu'])
         printGreen('    Mail collected!')
         # else:
@@ -1570,3 +1572,17 @@ def afkjourney():
                 printInfo(line)
         process.wait()
         printGreen('AFK Journey dailies done!')  
+
+def levelUp():
+    printBlue('Attempting to level up')
+    confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
+    clickXY(700, 1500, seconds=2) # Resonating crystal
+    clickXY(520, 1860, seconds=2) # Level up
+    clickXY(710, 1260) # Confirm
+    if not isVisible("labels/reso_lvl_progress"):
+        for _ in range(10):
+            clickXY(520, 1860)
+        printGreen('Leveled up successfully') 
+    else: 
+        printWarning("Not enough dust to level up")
+    recover(True)

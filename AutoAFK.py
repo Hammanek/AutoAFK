@@ -35,7 +35,7 @@ else:
     settings = os.path.join(cwd, 'settings.ini')
 config.read(settings)
 
-version = "0.19.5"
+version = "0.19.6"
 
 repo_releases = requests.get('https://api.github.com/repos/Hammanek/AutoAFK/releases/latest')
 json = repo_releases.json() if repo_releases and repo_releases.status_code == 200 else None
@@ -227,12 +227,12 @@ class App(customtkinter.CTk):
 class activityWindow(customtkinter.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.geometry("745x560")
+        self.geometry("745x610")
         self.title('Dailies Configuration')
         self.attributes("-topmost", True)
 
         # Activity Frame
-        self.activityFrame = customtkinter.CTkFrame(master=self, width=235, height=500)
+        self.activityFrame = customtkinter.CTkFrame(master=self, width=235, height=550)
         self.activityFrame.place(x=10, y=10)
         self.label = customtkinter.CTkLabel(master=self.activityFrame, text="Activities:", font=("Arial", 15, 'bold'))
         self.label.place(x=10, y=5)
@@ -325,6 +325,18 @@ class activityWindow(customtkinter.CTkToplevel):
         self.collectMerchantsCheckbox = customtkinter.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
         self.collectMerchantsCheckbox.place(x=200, y=460)
 
+        # Use Bag Comsumables
+        self.useBagConsumablesLabel = customtkinter.CTkLabel(master=self.activityFrame, text='Use Bag Consumables', fg_color=("gray86", "gray17"))
+        self.useBagConsumablesLabel.place(x=10, y=490)
+        self.useBagConsumablesCheckbox = customtkinter.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
+        self.useBagConsumablesCheckbox.place(x=200, y=490)
+
+        # Auto Level Up
+        self.levelUpLabel = customtkinter.CTkLabel(master=self.activityFrame, text='Auto Level Up', fg_color=("gray86", "gray17"))
+        self.levelUpLabel.place(x=10, y=520)
+        self.levelUpCheckbox = customtkinter.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
+        self.levelUpCheckbox.place(x=200, y=520)
+
 
         # Arena Frame
         self.ArenaFrame = customtkinter.CTkFrame(master=self, width=235, height=280)
@@ -361,7 +373,7 @@ class activityWindow(customtkinter.CTkToplevel):
         self.gladiatorCollectCheckbox.place(x=200, y=160)
 
         # Events Frame
-        self.eventsFrame = customtkinter.CTkFrame(master=self, width=235, height=210)
+        self.eventsFrame = customtkinter.CTkFrame(master=self, width=235, height=260)
         self.eventsFrame.place(x=255, y=300)
         self.label = customtkinter.CTkLabel(master=self.eventsFrame, text="Events:", font=("Arial", 15, 'bold'))
         self.label.place(x=10, y=5)
@@ -444,40 +456,34 @@ class activityWindow(customtkinter.CTkToplevel):
         self.dispatchEventBountiesCheckbox.place(x=200, y=280)
 
         # Misc Frame
-        self.MiscFrame = customtkinter.CTkFrame(master=self, width=235, height=180)
+        self.MiscFrame = customtkinter.CTkFrame(master=self, width=235, height=230)
         self.MiscFrame.place(x=500, y=330)
         self.label = customtkinter.CTkLabel(master=self.MiscFrame, text="Misc:", font=("Arial", 15, 'bold'))
         self.label.place(x=10, y=5)
 
-        # Use Bag Comsumables
-        self.useBagConsumablesLabel = customtkinter.CTkLabel(master=self.MiscFrame, text='Use Bag Consumables', fg_color=("gray86", "gray17"))
-        self.useBagConsumablesLabel.place(x=10, y=40)
-        self.useBagConsumablesCheckbox = customtkinter.CTkCheckBox(master=self.MiscFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
-        self.useBagConsumablesCheckbox.place(x=200, y=40)
-
         # Delayed start
         self.delayedStartLabel = customtkinter.CTkLabel(master=self.MiscFrame, text='Delay start by x minutes', fg_color=("gray86", "gray17"))
-        self.delayedStartLabel.place(x=10, y=70)
+        self.delayedStartLabel.place(x=10, y=40)
         self.delayedStartEntry = customtkinter.CTkEntry(master=self.MiscFrame, height=20, width=25)
         self.delayedStartEntry.insert('end', config.get('DAILIES', 'delayedstart'))
-        self.delayedStartEntry.place(x=200, y=70)
+        self.delayedStartEntry.place(x=200, y=40)
 
         # Hibernate system
         self.hibernateLabel = customtkinter.CTkLabel(master=self.MiscFrame, text='Hibernate system when done', fg_color=("gray86", "gray17"))
-        self.hibernateLabel.place(x=10, y=100)
+        self.hibernateLabel.place(x=10, y=70)
         self.hibernateCheckbox = customtkinter.CTkCheckBox(master=self.MiscFrame, text=None, onvalue=True, offvalue=False, command=self.activityUpdate)
-        self.hibernateCheckbox.place(x=200, y=100)
+        self.hibernateCheckbox.place(x=200, y=70)
 
         # Save button
         self.activitySaveButton = customtkinter.CTkButton(master=self, text="Save", fg_color=["#3B8ED0", "#1F6AA5"], width=120, command=self.activitySave)
-        self.activitySaveButton.place(x=320, y=520)
+        self.activitySaveButton.place(x=320, y=570)
 
         activityBoxes = ['collectRewards', 'collectMail', 'companionPoints', 'lendMercs', 'attemptCampaign', 'gladiatorCollect',
                          'fountainOfTime', 'kingsTower', 'collectInn', 'guildHunt', 'storePurchases', 'twistedRealm',
                          'collectQuests', 'collectMerchants', 'fightOfFates', 'battleOfBlood', 'circusTour', 'dispatchDust',
                          'dispatchDiamonds', 'dispatchShards', 'dispatchJuice', 'runLab', 'battleArena', 'tsCollect',
                          'useBagConsumables', 'heroesOfEsperia', 'dispatchSoloBounties', 'dispatchTeamBounties', 'hibernate',
-                         'dispatchEventBounties']
+                         'dispatchEventBounties','levelUp']
         for activity in activityBoxes:
             if activity[0:8] == 'dispatch':
                 if config.getboolean('BOUNTIES', activity):
@@ -498,7 +504,7 @@ class activityWindow(customtkinter.CTkToplevel):
                          'collectQuests', 'collectMerchants', 'fightOfFates', 'battleOfBlood', 'circusTour', 'dispatchDust',
                          'dispatchDiamonds', 'dispatchShards', 'dispatchJuice', 'runLab', 'battleArena', 'tsCollect',
                          'useBagConsumables', 'heroesOfEsperia', 'dispatchSoloBounties', 'dispatchTeamBounties', 'hibernate',
-                         'dispatchEventBounties']
+                         'dispatchEventBounties','levelUp']
         for activity in activityBoxes:
             if activity[0:8] == 'dispatch':
                 if self.__getattribute__(activity + 'Checkbox').get() == 1:
