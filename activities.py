@@ -917,7 +917,7 @@ def handleBattleofBlood(battles=3):
                 clickXY(550, 1250, seconds=1)
                 clickXY(350, 1250, seconds=1)
                 clickXY(550, 1850, seconds=1)
-            if isVisible('buttons/confirm_small', retry=3, region=(600, 1220, 200, 80)):
+            if isVisible('buttons/confirm_small', retry=3, region=(600, 1240, 200, 80)):
                 clickXY(325, 1200)
                 clickXY(700, 1270)
             # Place cards 3-4, click ready
