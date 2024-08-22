@@ -35,7 +35,7 @@ else:
     settings = os.path.join(cwd, 'settings.ini')
 config.read(settings)
 
-version = "0.19.6"
+version = "0.20"
 
 repo_releases = requests.get('https://api.github.com/repos/Hammanek/AutoAFK/releases/latest')
 json = repo_releases.json() if repo_releases and repo_releases.status_code == 200 else None
@@ -1082,6 +1082,10 @@ def dailies():
                 break  # Exit the loop if stop event is set
         if config.getboolean('DAILIES', 'usebagconsumables'):
             useBagConsumables()
+            if pauseOrStopEventCheck(app.dailies_pause_event, app.dailies_stop_event):
+                break  # Exit the loop if stop event is set
+        if config.getboolean('DAILIES', 'levelup'):
+            levelUp()
             if pauseOrStopEventCheck(app.dailies_pause_event, app.dailies_stop_event):
                 break  # Exit the loop if stop event is set
         printGreen('Dailies done!')

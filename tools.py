@@ -6,7 +6,7 @@ import numpy as np
 from ppadb.client import Client
 from AutoAFK import settings, args
 from pyscreeze import locate
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STARTUPINFO, CREATE_NO_WINDOW
 import time, datetime, os, configparser, sys
 from PIL import Image
 from shutil import which
@@ -50,7 +50,7 @@ def connect_device():
             if os.path.exists(config.get('ADVANCED', 'emulatorpath')):
                 # Run the executable file
                 printGreen('Starting emulator...')
-                Popen(config.get('ADVANCED', 'emulatorpath'), shell=False)
+                Popen(config.get('ADVANCED', 'emulatorpath'), shell=False, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW)
                 minimize_window()
                 wait(3)
                 minimize_window()
@@ -138,8 +138,8 @@ def configureADB():
 
     # Restarting the ADB server solves 90% of issues with it
     if config.getboolean('ADVANCED', 'adbrestart') is True:
-        Popen([adbpath, "kill-server"], stdout=PIPE).communicate()[0]
-        Popen([adbpath, "start-server"], stdout=PIPE).communicate()[0]
+        Popen([adbpath, "kill-server"], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
+        Popen([adbpath, "start-server"], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
     else:
         printWarning('ADB Restart disabled')
 
@@ -156,7 +156,7 @@ def configureADB():
             sys.exit(1)
         printWarning('Port ' + str(config.get('ADVANCED', 'port')) + ' found in settings.ini, using that')
         device = '127.0.0.1:' + str(config.get('ADVANCED', 'port'))
-        Popen([adbpath, 'connect', device], stdout=PIPE).communicate()[0]
+        Popen([adbpath, 'connect', device], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
         adb_device = adb.device('127.0.0.1:' + str(config.get('ADVANCED', 'port')))
         return adb_device
 
@@ -170,7 +170,7 @@ def configureADB():
     # Last step is to find the port ourselves, this is Windows only as it runs a PowerShell command
     if system() == 'Windows':
         device = '127.0.0.1:' + str(portScan())
-        Popen([adbpath, 'connect', device], stdout=PIPE).communicate()[0]
+        Popen([adbpath, 'connect', device], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
         adb_device = adb.device(device)
         return adb_device
 
@@ -187,7 +187,7 @@ def portScan():
     printWarning('No ADB devices found connected already, and no configured port in settings. Manually scanning for the port..')
 
     # Powershell command that returns all listening ports in use by HD-Player.exe
-    ports = Popen(["powershell.exe", "Get-NetTCPConnection -State Listen | Where-Object OwningProcess -eq (Get-Process hd-player | Select-Object -ExpandProperty Id) | Select-Object -ExpandProperty LocalPort"], stdout=PIPE).communicate()[0]
+    ports = Popen(["powershell.exe", "Get-NetTCPConnection -State Listen | Where-Object OwningProcess -eq (Get-Process hd-player | Select-Object -ExpandProperty Id) | Select-Object -ExpandProperty LocalPort"], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
     if len(ports.decode().splitlines()) > 0:
         printWarning(str(len(ports.decode().splitlines())) + ' ports found, trying them..')
 
@@ -195,7 +195,7 @@ def portScan():
         for port in ports.decode().splitlines(): # Split by linebreak
             port = int(port)
             if port % 2 != 0: # ADB will only use odd port numbers
-                connectmessage = Popen([adbpath, 'connect', '127.0.0.1:' + str(port)], stdout=PIPE).communicate()[0]
+                connectmessage = Popen([adbpath, 'connect', '127.0.0.1:' + str(port)], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
                 if connectmessage.decode().split(' ')[0] == 'failed':
                     printError(connectmessage.decode().rstrip())
                 elif connectmessage.decode().split(' ')[0] == 'connected':
