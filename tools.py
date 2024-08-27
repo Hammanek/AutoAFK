@@ -57,7 +57,7 @@ def connect_device():
     else: 
         was_running = True
 
-    printGreen('Attempting to connect..')
+    printGreen('Attempting to connect...')
 
     if connected is True: # Skip if we've ran through and connected succesfully already this session
         waitUntilGameActive() # but still confirm we start from the right place
@@ -79,7 +79,7 @@ def connect_device():
                 printBlue('This usually means the port is wrong as there is no device present')
             elif str(e) == 'ERROR: \'FAIL\' 0006closed':
                 printError('PPADB Error: ' + str(e) + ', retrying ' + str(connect_counter) + '/3')
-                printBlue('The selected port is not responding, is ADB enabled? Retrying..')
+                printBlue('The selected port is not responding, is ADB enabled? Retrying...')
             else:
                 printError('PPADB Error: ' + str(e) + ', retrying ' + str(connect_counter) + '/3')
             wait(3)
@@ -106,6 +106,10 @@ def connect_device():
 
     if connected is True:
         printGreen('Device: ' + str(device.serial) + ' successfully connected!')
+
+        if(float(device.shell('getprop ro.build.version.release')) > 7):
+            printWarning("Your android emulator is out of date, please update first!")
+            sys.exit(1)
 
         scrcpyClient = scrcpy.Client(device=device.serial)
         scrcpyClient.max_fps = max_fps
@@ -149,7 +153,7 @@ def configureADB():
         if port == '':
             port == 0 # So we don't throw a NaN error if the field's blank
         if ':' in str(port):
-            printError('Port entered includes the : symbol, it should only be the last 4 or 5 digits not the full IP:Port address. Exiting..')
+            printError('Port entered includes the : symbol, it should only be the last 4 or 5 digits not the full IP:Port address. Exiting...')
             sys.exit(1)
         if int(port) == 5037:
             printError('Port 5037 has been entered, this is the port of the ADB connection service not the emulator, check BlueStacks Settings - Preferences to get the ADB port number')
@@ -175,7 +179,7 @@ def configureADB():
         return adb_device
 
     # If none of the above work we exit
-    printError('No device found! Exiting..')
+    printError('No device found! Exiting...')
     sys.exit(1)
 
 # This takes all Listening ports opened by HD-Player.exe and tries to connect to them with ADB
@@ -184,12 +188,12 @@ def portScan():
     if system() != 'Windows' or not os.path.exists(adbpath):
         adbpath = which('adb') # If we're not on Windows or can't find adb.exe in the working directory we try and find it in the PATH
 
-    printWarning('No ADB devices found connected already, and no configured port in settings. Manually scanning for the port..')
+    printWarning('No ADB devices found connected already, and no configured port in settings. Manually scanning for the port...')
 
     # Powershell command that returns all listening ports in use by HD-Player.exe
     ports = Popen(["powershell.exe", "Get-NetTCPConnection -State Listen | Where-Object OwningProcess -eq (Get-Process hd-player | Select-Object -ExpandProperty Id) | Select-Object -ExpandProperty LocalPort"], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
     if len(ports.decode().splitlines()) > 0:
-        printWarning(str(len(ports.decode().splitlines())) + ' ports found, trying them..')
+        printWarning(str(len(ports.decode().splitlines())) + ' ports found, trying them...')
 
         # Scan ports
         for port in ports.decode().splitlines(): # Split by linebreak
@@ -212,10 +216,10 @@ def expandMenus():
 # Checks if AFK Arena process is running, if not we launch it
 def afkRunningCheck():
     if args['test']:
-        # printError('AFK Arena Test Server is not running, launching..')
+        # printError('AFK Arena Test Server is not running, launching...')
         device.shell('monkey -p  com.lilithgames.hgame.gp.id 1')
     elif not args['test']:
-        # printError('AFK Arena is not running, launching..')
+        # printError('AFK Arena is not running, launching...')
         device.shell('monkey -p com.lilithgame.hgame.gp 1')
     if config.getboolean('ADVANCED', 'debug') is True:
         print('Game check passed\n')
@@ -223,7 +227,7 @@ def afkRunningCheck():
 # Confirms that the game has loaded by checking for the campaign_selected button. We press a few buttons to navigate back if needed
 # May also require a ClickXY over Campaign to clear Time Limited Deals that appear
 def waitUntilGameActive():
-    printWarning('Searching for Campaign screen..')
+    printWarning('Searching for Campaign screen...')
     loadingcounter = 0
     timeoutcounter = 0
     if args['dailies']:
@@ -232,6 +236,7 @@ def waitUntilGameActive():
         loaded = 1
 
     while loadingcounter < loaded:
+        afkRunningCheck()
         clickXY(420, 50) # Neutral location for closing reward pop ups etc, should never be an in game button here
         buttons = [os.path.join('buttons', 'campaign_unselected'), os.path.join('buttons', 'exitmenu_trial'), os.path.join('buttons', 'back')]
         for button in buttons:
