@@ -1,9 +1,14 @@
 on: push
+
 jobs:
   delete_old_releases:
+    runs-on: ubuntu-latest # Přidáno určení prostředí
     steps:
-      - uses: actions/checkout@v3
-      - uses: Nats-ji/delete-old-releases@v1
+      - name: Checkout repository # Přidáno jméno kroku
+        uses: actions/checkout@v3
+
+      - name: Delete old releases # Přidáno jméno kroku
+        uses: Nats-ji/delete-old-releases@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           keep-count: 5
