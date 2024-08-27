@@ -1,9 +1,11 @@
 on: push
-steps:
-- uses: actions/checkout@v3
-- uses: Nats-ji/delete-old-releases@v1
-  with:
-    token: ${{ secrets.GITHUB_TOKEN }}
-    keep-count: 5
-    keep-old-minor-releases: true
-    keep-old-minor-releases-count: 1
+jobs:
+  delete_old_releases:
+    steps:
+      - uses: actions/checkout@v3
+      - uses: Nats-ji/delete-old-releases@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          keep-count: 5
+          keep-old-minor-releases: true
+          keep-old-minor-releases-count: 1
