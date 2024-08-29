@@ -427,7 +427,7 @@ class towerPusher():
                         printWarning('No victory found, checking again in ' + str(config.get('PUSH', 'victoryCheck') + ' minutes.'))
                     click('buttons/cancel', retry=3, suppress=True, region=boundaries['cancelAB'])
                 else: # If we don't see 0 we assume victory. We exit the battle, clear victory screen and clear time limited rewards screen
-                    printGreen('Victory found! Loading the ' + str(config.get('PUSH', 'formation') + ' formation for the current stage..'))
+                    printGreen('Victory found! Loading formation for the current stage..')
                     click('buttons/exit', retry=3, suppress=True, region=boundaries['exitAB'])
                     click('buttons/pause', 0.8, retry=3, suppress=True, region=boundaries['pauseBattle'])  # 3 retries as ulting heroes can cover the button
                     click('buttons/exitbattle', retry=2, suppress=True, region=boundaries['exitBattle'])
@@ -459,7 +459,7 @@ def pushCampaign(formation=3, duration=1,app=None):
                     click('buttons/cancel', retry=3, suppress=True, region=boundaries['cancelAB'])
                     wait((duration * 60) - 30) # Sleep for the wait duration
                 else: # If it's not 0 we have passed a stage
-                    printGreen('Victory found! Loading the ' + str(config.get('PUSH', 'formation') + ' formation for the current stage..'))
+                    printGreen('Victory found! Loading formation for the current stage..')
                     click('buttons/exit', suppress=True, retry=3, region=boundaries['exitAB'])
                     click('buttons/pause', confidence=0.8, retry=3, suppress=True, region=boundaries['pauseBattle'])  # 3 retries as ulting heroes can cover the button
                     click('buttons/exitbattle', suppress=True, retry=3, region=boundaries['exitBattle'])
@@ -917,7 +917,7 @@ def handleBattleofBlood(battles=3):
                 clickXY(550, 1250, seconds=1)
                 clickXY(350, 1250, seconds=1)
                 clickXY(550, 1850, seconds=1)
-            if isVisible('buttons/confirm_small', retry=3, region=(600, 1220, 200, 80)):
+            if isVisible('buttons/confirm_small', retry=3, region=(600, 1240, 200, 80)):
                 clickXY(325, 1200)
                 clickXY(700, 1270)
             # Place cards 3-4, click ready
@@ -1578,8 +1578,8 @@ def levelUp():
     confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
     clickXY(700, 1500, seconds=2) # Resonating crystal
     clickXY(520, 1860, seconds=2) # Level up
-    clickXY(710, 1260) # Confirm
-    if not isVisible("labels/reso_lvl_progress"):
+    clickXY(710, 1260, seconds=2) # Confirm
+    if not isVisible("buttons/level_up"):
         for _ in range(10):
             clickXY(520, 1860)
         printGreen('Leveled up successfully') 
