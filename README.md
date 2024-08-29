@@ -43,7 +43,7 @@ Configure your MuMu Player client so that:
 * DPI is 240
 * AFK's language is set to English
 
-Then download the latest [release](https://github.com/Hammanek/AutoAFK), unzip and run AutoAFK.exe.
+Then download the latest [release](https://github.com/Hammanek/AutoAFK/releases/), unzip and run AutoAFK.exe.
 
 # Road map
 The following features will be added soon(tm)

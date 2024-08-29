@@ -107,7 +107,7 @@ def connect_device():
     if connected is True:
         printGreen('Device: ' + str(device.serial) + ' successfully connected!')
 
-        if(float(device.shell('getprop ro.build.version.release')) > 7):
+        if(float(device.shell('getprop ro.build.version.release')) < 7):
             printWarning("Your android emulator is out of date, please update first!")
             sys.exit(1)
 
