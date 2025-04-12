@@ -4,10 +4,10 @@ import random
 import os
 import numpy as np
 from ppadb.client import Client
-from AutoAFK import settings, args
+from AutoAFK import config, args, printWarning, printGreen, printBlue, writeToLog
 from pyscreeze import locate
 from subprocess import Popen, PIPE, STARTUPINFO, CREATE_NO_WINDOW
-import time, datetime, os, configparser, sys
+import time, datetime, os, sys
 from PIL import Image
 from shutil import which
 from platform import system
@@ -16,12 +16,8 @@ import psutil
 import win32gui
 import win32con
 import ctypes
-from telegram import *
-from AutoAFK import printWarning, printGreen, printBlue, writeToLog
 
 # Configs/settings
-config = configparser.ConfigParser()
-config.read(settings) # load settings
 cwd = os.path.dirname(__file__) # variable for current directory of AutoAFK.exe
 os.system('color')  # So colourful text works
 connected = False
@@ -41,7 +37,6 @@ def connect_device():
     global connected  # So we don't reconnect with every new activity in the same session
     global config
     was_running = False
-    config.read(settings) # Load settings
 
     # Check if emulator process is already running and try to run it if not
     if config.has_option('ADVANCED', 'emulatorpath') and not is_process_running(config.get('ADVANCED', 'emulatorpath').rsplit('\\', 1)[-1]):
@@ -107,7 +102,7 @@ def connect_device():
     if connected is True:
         printGreen('Device: ' + str(device.serial) + ' successfully connected!')
 
-        if(float(device.shell('getprop ro.build.version.release')) < 7):
+        if(float(device.shell('getprop ro.build.version.release').split('.')[0]) < 7):
             printWarning("Your android emulator is out of date, please update first!")
             sys.exit(1)
 
@@ -133,9 +128,6 @@ def connect_device():
 # First it restarts ADB then checks for a port in settings.ini, after that we check for existing connected ADB devices
 # If neither are found we run portScan() to find the active port and connect using that
 def configureADB():
-    # Load any new values (ie port changed and saved) into memory
-    config.read(settings)
-
     adbpath = os.path.join(cwd, 'adb.exe') # Locate adb.exe in working directory
     if system() != 'Windows' or not os.path.exists(adbpath):
         adbpath = which('adb') # If we're not on Windows or can't find adb.exe in the working directory we try and find it in the PATH
@@ -158,7 +150,7 @@ def configureADB():
         if int(port) == 5037:
             printError('Port 5037 has been entered, this is the port of the ADB connection service not the emulator, check BlueStacks Settings - Preferences to get the ADB port number')
             sys.exit(1)
-        printWarning('Port ' + str(config.get('ADVANCED', 'port')) + ' found in settings.ini, using that')
+        printWarning('Port ' + str(config.get('ADVANCED', 'port')) + ' found in settings, using that')
         device = '127.0.0.1:' + str(config.get('ADVANCED', 'port'))
         Popen([adbpath, 'connect', device], stdout=PIPE, startupinfo=STARTUPINFO(), creationflags=CREATE_NO_WINDOW).communicate()[0]
         adb_device = adb.device('127.0.0.1:' + str(config.get('ADVANCED', 'port')))

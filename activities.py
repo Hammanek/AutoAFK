@@ -87,8 +87,11 @@ def collectMail():
         clickXY(960, 630, seconds=2) # Click Mail
         click('buttons/collect_all')
         clickXY(550, 1600) # Clear any popups
-        clickXY(300, 1600) # Delete messages
-        clickXY(700, 1260) # Confirm
+
+        if config.getboolean('DAILIES', 'deletemail'):
+            clickXY(300, 1600) # Delete messages
+            clickXY(700, 1260) # Confirm
+
         click('buttons/back', region=boundaries['backMenu'])
         printGreen('    Mail collected!')
         # else:
@@ -99,7 +102,7 @@ def collectMail():
 def collectCompanionPoints(mercs=False):
     printBlue('Attempting to send/receive companion points')
     if isVisible('buttons/friends', region=boundaries['friends']):
-        if (pixelCheck(1020, 688, 0) > 240):  # We check if the pixel where the notification sits has a red value of higher than 240
+        if (pixelCheck(1020, 688, 0) > 220):  # We check if the pixel where the notification sits has a red value of higher than 220
             clickXY(960, 810)
             click('buttons/sendandreceive', region=boundaries['sendrecieve'])
             if mercs is True:
@@ -112,14 +115,14 @@ def collectCompanionPoints(mercs=False):
             click('buttons/back', region=boundaries['backMenu'])
             printGreen('    Friends Points Sent')
         else:
-            printWarning('    Friends notification not found')
+            printError('    Friends notification not found')
 
 def collectFastRewards(count):
     printBlue('Attempting to collecting Fast Rewards ' + str(count) + 'x times')
     counter = 0
     confirmLocation('campaign', region=boundaries['campaignSelect'])
     if isVisible('buttons/fastrewards', region=boundaries['fastrewards']):
-        if (pixelCheck(980, 1620, 0) > 220):  # We check if the pixel where the notification sits has a red value of higher than 240
+        if (pixelCheck(980, 1620, 0) > 220):  # We check if the pixel where the notification sits has a red value of higher than 220
             clickXY(950, 1660)
             while counter < count:
                 clickXY(710, 1260, seconds=3)
@@ -244,8 +247,8 @@ def handleArenaOfHeroes(count, opponent, app):
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
     clickXY(740, 1100)
     clickXY(550, 50)
-    if isVisible('labels/arenaofheroes_new'): # The label font changes for reasons
-        click('labels/arenaofheroes_new', suppress=True)
+    if isVisible('labels/arenaofheroes'): # The label font changes for reasons
+        click('labels/arenaofheroes', suppress=True)
         wait(1)
         click('buttons/challenge', retry=3, region=boundaries['challengeAoH']) # retries for animated button
         while counter < count:
@@ -277,7 +280,7 @@ def handleArenaOfHeroes(count, opponent, app):
 def collectGladiatorCoins():
     printBlue('Collecting Gladiator Coins')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
-    clickXY(740, 1050)
+    clickXY(740, 1100)
     clickXY(550, 50)
     swipe(550, 800, 550, 500, duration=200, seconds=2) # scroll down
     if isVisible('labels/legendstournament_new'): # The label font changes for reasons
@@ -338,6 +341,7 @@ def collectTSRewards():
                 click('buttons/back', retry=3, region=boundaries['backMenu'])
                 click('buttons/back', retry=3, region=boundaries['backMenu'])
                 printGreen('    Treasure Scramble daily loot collected!')
+                recover(True)
             return
     else:
         printError('    Treasure Scramble not found, attempting to recover')
@@ -347,7 +351,7 @@ def collectFountainOfTime():
     printBlue('Collecting Fountain of Time')
     confirmLocation('darkforest', region=boundaries['darkforestSelect'])
     clickXY(850, 700, seconds=4)
-    if isVisible('buttons/collect'):
+    if isVisible('buttons/collect_wide'):
         clickXY(550, 1450)
         clickXY(290, 70)
         
@@ -435,7 +439,7 @@ class towerPusher():
                     wait(3)
                     clickXY(550, 1750) # To clear the Limited Rewards pop up every 20 stages
             else: # If after clicking we don't get the Auto Battle notice pop up something has gone wrong so we recover() and load pushTower() again
-                printWarning('AutoBattle screen not found, reloading auto-push..')
+                printError('AutoBattle screen not found, reloading auto-push..')
                 if recover() is True:
                     towerPusher.towerOpen = False
                     openTower(tower)
@@ -480,7 +484,7 @@ def configureBattleFormation(formation):
         if config.getboolean('ADVANCED', 'popularformations'): # Use popular formations tab
             clickXY(800, 1650, seconds=2)  # Change to 'Popular' tab
         clickXY(850, 425 + (formation * 175), seconds=2)
-        click('buttons/use', retry=3, region=boundaries['useAB'], seconds=2)
+        click('buttons/use', retry=3, seconds=2)
 
         # Configure Artifacts
         while artifacts is None and counter <= 5: # loop because sometimes isVisible returns None here
@@ -536,9 +540,8 @@ def collectInnGifts():
                 continue
             checks += 1
             wait()
-        click('buttons/back', region=boundaries['backMenu'])
         printGreen('    Inn Gifts collected.')
-        wait(2) # wait before next task as loading ranhorn can be slow
+        recover(1)
     else:
         printError('    Inn not found, attempting to recover')
         recover()
@@ -817,7 +820,7 @@ def handleTwistedRealm():
         printGreen('    Twisted Realm found, battling')
         if isVisible('buttons/challenge_tr', retry=3, confidence=0.8):
             clickXY(550, 1850, seconds=2)
-            click('buttons/autobattle', retry=3, seconds=2)
+            click('buttons/autobattle', retry=3, seconds=3)
             if isVisible('buttons/checkbox_blank'):
                 clickXY(300, 975)  # Activate Skip Battle Animations
             clickXY(700, 1300, seconds=6)
@@ -844,11 +847,21 @@ def handleTwistedRealm():
 def handleFightOfFates(battles=3):
     printBlue('Attempting to run Fight of Fates ' + str(battles) + ' times')
     counter = 0
-    click('buttons/fightoffates', confidence=0.8, retry=5, seconds=3)
-    if isVisible('labels/fightoffates'):
+    click('buttons/events', confidence=0.8, retry=5, seconds=3)
+
+    if isVisible('labels/fightoffates', click=True):
+        visible=True
+    else:
+        swipe(550, 600, 550, 300, duration=200, seconds=2)
+        if isVisible('labels/fightoffates', click=True):
+            visible=True   
+        else:
+            visible=False
+
+    if visible:
         while counter < battles:
             click('buttons/challenge_tr', confidence=0.8, suppress=True, retry=3, seconds=15)
-            while not isVisible('labels/fightoffates', confidence=0.95):
+            while not isVisible('labels/fightoffates_inside', confidence=0.95):
                 # Hero
                 swipe(200, 1700, 290, 975, 200)
                 # Skill 1
@@ -875,9 +888,10 @@ def handleFightOfFates(battles=3):
         # Back twice to exit
         clickXY(70, 1810, seconds=1)
         clickXY(70, 1810, seconds=1)
+        clickXY(70, 1810, seconds=1)
         printGreen('    Fight of Fates attempted successfully')
     else:
-        printWarning('Fight of Fates not found, recovering..')
+        printError('Fight of Fates not found, recovering..')
         recover()
 
 # Basic support for dailies quests, we simply choose the 5 cards from the top row of our hand
@@ -975,7 +989,7 @@ def handleBattleofBlood(battles=3):
             printWarning('Issue exiting Battle of Blood, recovering..')
             recover()
     else:
-        printWarning('Battle of Blood not found, recovering..')
+        printError('Battle of Blood not found, recovering..')
         recover()
 
 def handleCircusTour(battles = 3):
@@ -1016,7 +1030,7 @@ def handleCircusTour(battles = 3):
             printWarning('Issue exiting Circus Tour, recovering..')
             recover()
     else:
-        printWarning('Circus Tour not found, recovering..')
+        printError('Circus Tour not found, recovering..')
         recover()
 
 def handleLab():
@@ -1577,12 +1591,36 @@ def levelUp():
     printBlue('Attempting to level up')
     confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
     clickXY(700, 1500, seconds=2) # Resonating crystal
-    clickXY(520, 1860, seconds=2) # Level up
-    clickXY(710, 1260, seconds=2) # Confirm
-    if not isVisible("buttons/level_up"):
-        for _ in range(10):
+
+    if isVisible("buttons/level_up"):
+        clickXY(520, 1860, seconds=2) # Level up
+        clickXY(710, 1260, seconds=3) # Confirm
+        clickXY(700, 50, seconds=2) # Clear message
+
+    if isVisible("buttons/strengthen"):
+        while isVisible("buttons/strengthen", seconds=0.2):
             clickXY(520, 1860)
-        printGreen('Leveled up successfully') 
+        printGreen('Leveled up successfully')
     else: 
         printWarning("Not enough dust to level up")
+
     recover(True)
+
+def getMercs():
+    if d.isoweekday() == 7: # Sunday
+       
+        printBlue('Getting custom mercs')
+        confirmLocation('ranhorn', region=boundaries['ranhornSelect'])
+
+        clickXY(960, 810) # Friends
+        clickXY(725, 1760, seconds=2) # Short-Term
+
+        # Lan
+        clickXY(1000, 1600)
+        if isVisible("mercs/lan", click=True):
+            while isVisible("buttons/apply", click=True):
+                wait(1)
+
+        
+           
+        recover(True)
