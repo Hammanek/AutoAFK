@@ -1,0 +1,96 @@
+[DAILIES]
+collectrewards = True
+collectmail = True
+deletemail = False
+fastrewards = 0
+companionpoints = True
+lendmercs = False
+attemptcampaign = False
+fountainoftime = True
+kingstower = True
+collectinn = True
+guildhunt = True
+storepurchases = True
+shoprefreshes = 0
+twistedrealm = True
+collectquests = True
+collectmerchants = True
+runlab = True
+usebagconsumables = True
+delayedstart = 0
+hibernate = False
+levelup = True
+summonhero = False
+sorenactivate = False
+sorenactivate_days = 1,3,5
+
+[ARENA]
+battlearena = True
+arenabattles = 5
+arenaopponent = 1
+tscollect = True
+gladiatorcollect = True
+
+[ACTIVITY]
+activitybattles = 100
+
+[BOUNTIES]
+dispatchsolobounties = True
+dispatchteambounties = True
+dispatcheventbounties = True
+dispatchdust = True
+dispatchdiamonds = False
+dispatchshards = True
+dispatchjuice = True
+refreshes = 0
+remaining = 2
+
+[EVENTS]
+fightoffates = False
+battleofblood = False
+circustour = False
+heroesofesperia = False
+
+[SHOP]
+arcanestaffs = True
+cores = False
+timegazer = True
+baits = False
+dust_gold = True
+shards_gold = True
+dust_diamond = False
+elite_soulstone = False
+superb_soulstone = False
+silver_emblem = False
+gold_emblem = False
+poe = True
+quick = True
+
+[PUSH]
+formation = 3rd
+victorycheck = 1
+suppressspam = True
+useartifacts = True
+cycleformation = 30
+
+[ADVANCED]
+port = 0
+loadingmuliplier = 1.0
+server = 0
+debug = False
+ignoreformations = False
+adbrestart = True
+popularformations = False
+emulatorpath = C:\Program Files\Netease\MuMuPlayerGlobal-12.0\shell\MuMuPlayer.exe
+customcode = False
+autoupdate = True
+
+[TELEGRAM]
+enable = False
+chat_id = 
+token = 
+
+[DISCORD]
+enable = False
+channel_id = 
+token = 

@@ -1,0 +1,26 @@
+# AutoAFK v2.0 - Complete Dependencies
+# Python 3.8-3.12 compatible
+
+# Core image processing
+opencv-python>=4.8.0,<5.0.0
+numpy>=1.24.0,<2.0.0
+Pillow>=10.0.0,<11.0.0
+pyscreeze>=0.1.29
+
+# GUI
+customtkinter>=5.2.0,<6.0.0
+
+# ADB (Android Debug Bridge)
+pure-python-adb>=0.3.0.dev0
+
+# System utilities
+psutil>=5.9.0,<6.0.0
+
+# HTTP requests
+requests>=2.31.0,<3.0.0
+
+# Notifications
+python-telegram-bot>=20.0,<21.0.0  # Telegram (optional)
+plyer>=2.1.0  # Desktop notifications (optional)
+
+# Note: All version constraints ensure Python 3.8-3.12 compatibility
