@@ -167,13 +167,16 @@ class Logger:
         root_logger.setLevel(logging.DEBUG)
         
         # Console handler with color prefixes
-        console_handler = logging.StreamHandler(sys.stdout)
-        console_handler.setLevel(logging.INFO)
-        # Simple format without level name (will be added as prefix by ColoredFormatter)
-        console_formatter = ColoredFormatter(
-            '%(message)s'
-        )
-        console_handler.setFormatter(console_formatter)
+        # In compiled version, sys.stdout might be None, so check first
+        if sys.stdout is not None:
+            console_handler = logging.StreamHandler(sys.stdout)
+            console_handler.setLevel(logging.INFO)
+            # Simple format without level name (will be added as prefix by ColoredFormatter)
+            console_formatter = ColoredFormatter(
+                '%(message)s'
+            )
+            console_handler.setFormatter(console_formatter)
+            root_logger.addHandler(console_handler)
         
         # File handler with full details
         file_handler = logging.FileHandler(log_file, encoding='utf-8')
@@ -189,7 +192,6 @@ class Logger:
         screenshot_handler.setLevel(logging.ERROR)
         
         # Add handlers
-        root_logger.addHandler(console_handler)
         root_logger.addHandler(file_handler)
         root_logger.addHandler(screenshot_handler)
         

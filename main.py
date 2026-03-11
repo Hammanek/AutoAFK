@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 
 # Version - Update this when releasing new version
-VERSION = "2.0.0"
+VERSION = "2.0.1"
 
 # GitHub Repository
 GITHUB_REPO = "Hammanek/AutoAFK"
