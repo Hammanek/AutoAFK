@@ -132,6 +132,9 @@ def close_running_bot():
     """Try to close running AutoAFK.exe"""
     print("[5/7] Closing running bot...")
     try:
+        # Wait a bit to ensure bot has time to close itself
+        time.sleep(3)
+        
         # Try to kill AutoAFK.exe process
         if sys.platform == 'win32':
             os.system('taskkill /F /IM AutoAFK.exe >nul 2>&1')

@@ -228,11 +228,13 @@ class App(ctk.CTk):
             # Run update.bat for both compiled and source versions
             if os.path.exists('update.bat'):
                 subprocess.Popen(['update.bat'], shell=True)
-                self.textbox.insert('end', '🔄 Updater started, closing bot...\n', 'orange')
-                self.after(1000, self.quit)
+                self.textbox.insert('end', '🔄 Updater started, closing bot in 3 seconds...\n', 'orange')
+                # Wait 3 seconds to let updater start, then close
+                self.after(3000, self.quit)
             else:
                 self.textbox.insert('end', '❌ update.bat not found\n', 'error')
         except Exception as e:
+            self.textbox.insert('end', f'❌ Failed to start updater: {e}\n', 'error')
             self.textbox.insert('end', f'❌ Failed to start updater: {e}\n', 'error')
         
     def _create_widgets(self) -> None:
