@@ -628,6 +628,10 @@ class App(ctk.CTk):
             activity = self.activityFormationDropdown.get()
             battles = int(self.pvpEntry.get())
             
+            # Save battles count to config
+            self.config.set('ACTIVITIES', 'arena_battles', str(battles))
+            self.config.save()
+            
             logger.info(f"Starting {activity} ({battles} battles)...")
             
             # Initialize modules if not already done
