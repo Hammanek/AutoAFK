@@ -333,7 +333,13 @@ class App(ctk.CTk):
             width=80
         )
         # Load saved formation from config
-        saved_formation = self.config.getint('PUSH', 'formation', fallback=3)
+        saved_formation_str = self.config.get('PUSH', 'formation', fallback='3')
+        # Parse formation - handle both "3" and "3rd" formats
+        if saved_formation_str.isdigit():
+            saved_formation = int(saved_formation_str)
+        else:
+            # Extract number from "3rd" format
+            saved_formation = int(saved_formation_str[0])
         formation_map = {1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th"}
         self.pushFormationDropdown.set(formation_map.get(saved_formation, "3rd"))
         self.pushFormationDropdown.place(x=10, y=110)
