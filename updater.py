@@ -378,14 +378,6 @@ def main():
         print("=" * 60)
         print()
         
-        # Remove update marker to allow future updates
-        try:
-            marker_path = os.path.join(current_dir, '.update_check')
-            if os.path.exists(marker_path):
-                os.remove(marker_path)
-        except:
-            pass
-        
         # Restart bot
         if restart_bot():
             print()
