@@ -332,7 +332,10 @@ class App(ctk.CTk):
             values=["1st", "2nd", "3rd", "4th", "5th"],
             width=80
         )
-        self.pushFormationDropdown.set("3rd")
+        # Load saved formation from config
+        saved_formation = self.config.getint('PUSH', 'formation', fallback=3)
+        formation_map = {1: "1st", 2: "2nd", 3: "3rd", 4: "4th", 5: "5th"}
+        self.pushFormationDropdown.set(formation_map.get(saved_formation, "3rd"))
         self.pushFormationDropdown.place(x=10, y=110)
         
         # Textbox - Modern styling
@@ -679,6 +682,10 @@ class App(ctk.CTk):
         try:
             location = self.pushLocationDropdown.get()
             formation = int(self.pushFormationDropdown.get()[0])
+            
+            # Save formation to config
+            self.config.set('PUSH', 'formation', str(formation))
+            self.config.save()
             
             logger.info(f"Auto-Pushing {location} using formation {formation}")
             
