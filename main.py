@@ -137,6 +137,18 @@ class App(ctk.CTk):
         
     def _check_for_updates(self) -> None:
         """Check for updates and display in textbox"""
+        # Check if update was recently attempted (within last 5 minutes)
+        update_marker = Path('.update_check')
+        if update_marker.exists():
+            try:
+                import time
+                last_check = update_marker.stat().st_mtime
+                if time.time() - last_check < 300:  # 5 minutes
+                    logger.debug("Update check skipped (recently checked)")
+                    return
+            except:
+                pass
+        
         try:
             update_available, current, latest = VersionChecker.check_for_updates()
             
@@ -159,6 +171,8 @@ class App(ctk.CTk):
                     # Check if autoupdate is enabled
                     if self.config.getboolean('ADVANCED', 'autoupdate', fallback=False):
                         self.textbox.insert('end', '🔄 Auto-update enabled, starting updater...\n\n', 'orange')
+                        # Mark that update is being attempted
+                        update_marker.touch()
                         self.after(2000, self._run_updater)  # Run after 2 seconds
                     else:
                         self.textbox.insert('end', '💡 Run update.bat to update or download from:\n', 'blue')

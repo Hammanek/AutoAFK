@@ -54,6 +54,7 @@ settings.ini
 *.tmp
 *.bak
 *.cache
+.update_check
 
 # OS
 Thumbs.db
