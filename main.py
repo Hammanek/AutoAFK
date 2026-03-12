@@ -12,7 +12,7 @@ import subprocess
 from pathlib import Path
 
 # Version - Update this when releasing new version
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 
 # GitHub Repository
 GITHUB_REPO = "Hammanek/AutoAFK"
@@ -776,7 +776,7 @@ class ActivityWindow(ctk.CTkToplevel):
     
     def __init__(self, parent):
         super().__init__(parent)
-        self.geometry("745x700")
+        self.geometry("745x560")
         self.resizable(False, False)  # Disable window resizing
         self.title('Dailies Configuration')
         self.attributes("-topmost", True)
@@ -788,7 +788,7 @@ class ActivityWindow(ctk.CTkToplevel):
         self.bounties_widgets = {}
         
         # Activities Frame
-        self.activityFrame = ctk.CTkFrame(master=self, width=235, height=675)
+        self.activityFrame = ctk.CTkFrame(master=self, width=235, height=500)
         self.activityFrame.place(x=10, y=10)
         ctk.CTkLabel(master=self.activityFrame, text="Activities:", font=("Arial", 15, 'bold')).place(x=10, y=5)
         
@@ -796,6 +796,7 @@ class ActivityWindow(ctk.CTkToplevel):
             ("Collect AFK Rewards", "checkbox", "collectRewards", "DAILIES"),
             ("Collect Mail", "checkbox", "collectMail", "DAILIES"),
             ("Companion Points", "checkbox", "companionPoints", "DAILIES"),
+            ("Auto lend mercs?", "checkbox", "lendMercs", "DAILIES", 40),
             ("Fast Rewards", "entry", "fastrewards", "DAILIES"),
             ("Attempt Campaign", "checkbox", "attemptCampaign", "DAILIES"),
             ("Fountain of Time", "checkbox", "fountainOfTime", "DAILIES"),
@@ -803,20 +804,23 @@ class ActivityWindow(ctk.CTkToplevel):
             ("Collect Inn Gifts", "checkbox", "collectInn", "DAILIES"),
             ("Guild Hunts", "checkbox", "guildHunt", "DAILIES"),
             ("Store Purchases", "checkbox", "storePurchases", "DAILIES"),
-            ("Shop Refreshes", "entry", "shoprefreshes", "DAILIES"),
+            ("Shop Refreshes", "entry", "shoprefreshes", "DAILIES", 40),
             ("Twisted Realm", "checkbox", "twistedRealm", "DAILIES"),
             ("Run Lab", "checkbox", "runLab", "DAILIES"),
             ("Collect Quests", "checkbox", "collectQuests", "DAILIES"),
+            ("Collect Merchants", "checkbox", "collectMerchants", "DAILIES"),
             ("Use Bag Consumables", "checkbox", "useBagConsumables", "DAILIES"),
-            ("Auto Level Up", "checkbox", "levelUp", "DAILIES"),
         ]
         
         y_offset = 30
         start_y = 40
-        for i, (label_text, widget_type, config_key, section) in enumerate(activities):
-            y = start_y + i * y_offset
+        y = start_y
+        for item in activities:
+            label_text, widget_type, config_key, section = item[:4]
+            x_offset = item[4] if len(item) > 4 else 10
+            
             label = ctk.CTkLabel(master=self.activityFrame, text=label_text)
-            label.place(x=10, y=y)
+            label.place(x=x_offset, y=y)
             if widget_type == "checkbox":
                 cb = ctk.CTkCheckBox(master=self.activityFrame, text=None, onvalue=True, offvalue=False)
                 cb.place(x=200, y=y)
@@ -828,6 +832,7 @@ class ActivityWindow(ctk.CTkToplevel):
                 entry.insert('end', self.config.get(section, config_key, fallback='0'))
                 entry.place(x=200, y=y)
                 self.activity_widgets[config_key] = entry
+            y += y_offset
                 
         # Arena Frame
         self.ArenaFrame = ctk.CTkFrame(master=self, width=235, height=280)
@@ -836,15 +841,19 @@ class ActivityWindow(ctk.CTkToplevel):
         
         arena_items = [
             ("Battle Arena of Heroes", "checkbox", "battleArena", "ARENA"),
-            ("Number of Battles", "entry", "arenaBattles", "ARENA"),
-            ("Which Opponent", "entry", "arenaOpponent", "ARENA"),
+            ("Number of Battles", "entry", "arenaBattles", "ARENA", 40),
+            ("Which Opponent", "entry", "arenaOpponent", "ARENA", 40),
+            ("Collect Daily TS loot", "checkbox", "tsCollect", "ARENA"),
             ("Collect Gladiator Coins", "checkbox", "gladiatorCollect", "ARENA"),
         ]
         
-        for i, (label_text, widget_type, config_key, section) in enumerate(arena_items):
-            y = 40 + i * y_offset
+        y = 40
+        for item in arena_items:
+            label_text, widget_type, config_key, section = item[:4]
+            x_offset = item[4] if len(item) > 4 else 10
+            
             label = ctk.CTkLabel(master=self.ArenaFrame, text=label_text)
-            label.place(x=10, y=y)
+            label.place(x=x_offset, y=y)
             if widget_type == "checkbox":
                 cb = ctk.CTkCheckBox(master=self.ArenaFrame, text=None, onvalue=True, offvalue=False)
                 cb.place(x=200, y=y)
@@ -856,9 +865,10 @@ class ActivityWindow(ctk.CTkToplevel):
                 entry.insert('end', self.config.get(section, config_key, fallback='5'))
                 entry.place(x=198, y=y)
                 self.arena_widgets[config_key] = entry
+            y += y_offset
                 
         # Events Frame
-        self.eventsFrame = ctk.CTkFrame(master=self, width=235, height=260)
+        self.eventsFrame = ctk.CTkFrame(master=self, width=235, height=210)
         self.eventsFrame.place(x=255, y=300)
         ctk.CTkLabel(master=self.eventsFrame, text="Events:", font=("Arial", 15, 'bold')).place(x=10, y=5)
         
@@ -869,8 +879,8 @@ class ActivityWindow(ctk.CTkToplevel):
             ("Heroes of Esperia", "checkbox", "heroesOfEsperia", "EVENTS"),
         ]
         
-        for i, (label_text, widget_type, config_key, section) in enumerate(events_items):
-            y = 40 + i * y_offset
+        y = 40
+        for label_text, widget_type, config_key, section in events_items:
             label = ctk.CTkLabel(master=self.eventsFrame, text=label_text)
             label.place(x=10, y=y)
             cb = ctk.CTkCheckBox(master=self.eventsFrame, text=None, onvalue=True, offvalue=False)
@@ -878,6 +888,68 @@ class ActivityWindow(ctk.CTkToplevel):
             self.events_widgets[config_key] = cb
             if self.config.getboolean(section, config_key, fallback=False):
                 cb.select()
+            y += y_offset
+        
+        # Bounties Frame
+        self.BountiesFrame = ctk.CTkFrame(master=self, width=235, height=310)
+        self.BountiesFrame.place(x=500, y=10)
+        ctk.CTkLabel(master=self.BountiesFrame, text="Bounties:", font=("Arial", 15, 'bold')).place(x=10, y=5)
+        
+        bounties_items = [
+            ("Enable solo bounties", "checkbox", "dispatchSoloBounties", "BOUNTIES"),
+            ("Enable team bounties", "checkbox", "dispatchTeamBounties", "BOUNTIES"),
+            ("Dispatch Dust", "checkbox", "dispatchDust", "BOUNTIES"),
+            ("Dispatch Diamonds", "checkbox", "dispatchDiamonds", "BOUNTIES"),
+            ("Dispatch Shards", "checkbox", "dispatchShards", "BOUNTIES"),
+            ("Dispatch Juice", "checkbox", "dispatchJuice", "BOUNTIES"),
+            ("Number of Refreshes", "entry", "refreshes", "BOUNTIES"),
+            ("# Remaining to Dispatch All", "entry", "remaining", "BOUNTIES"),
+            ("Enable event bounties", "checkbox", "dispatchEventBounties", "BOUNTIES"),
+        ]
+        
+        y = 40
+        for label_text, widget_type, config_key, section in bounties_items:
+            label = ctk.CTkLabel(master=self.BountiesFrame, text=label_text)
+            label.place(x=10, y=y)
+            if widget_type == "checkbox":
+                cb = ctk.CTkCheckBox(master=self.BountiesFrame, text=None, onvalue=True, offvalue=False)
+                cb.place(x=200, y=y)
+                self.bounties_widgets[config_key] = cb
+                if self.config.getboolean(section, config_key, fallback=False):
+                    cb.select()
+            elif widget_type == "entry":
+                entry = ctk.CTkEntry(master=self.BountiesFrame, height=20, width=25)
+                entry.insert('end', self.config.get(section, config_key, fallback='0'))
+                entry.place(x=200, y=y)
+                self.bounties_widgets[config_key] = entry
+            y += y_offset
+        
+        # Misc Frame
+        self.MiscFrame = ctk.CTkFrame(master=self, width=235, height=180)
+        self.MiscFrame.place(x=500, y=330)
+        ctk.CTkLabel(master=self.MiscFrame, text="Misc:", font=("Arial", 15, 'bold')).place(x=10, y=5)
+        
+        misc_items = [
+            ("Delay start by x minutes", "entry", "delayedstart", "DAILIES"),
+            ("Hibernate system when done", "checkbox", "hibernate", "DAILIES"),
+        ]
+        
+        y = 40
+        for label_text, widget_type, config_key, section in misc_items:
+            label = ctk.CTkLabel(master=self.MiscFrame, text=label_text)
+            label.place(x=10, y=y)
+            if widget_type == "checkbox":
+                cb = ctk.CTkCheckBox(master=self.MiscFrame, text=None, onvalue=True, offvalue=False)
+                cb.place(x=200, y=y)
+                self.activity_widgets[config_key] = cb
+                if self.config.getboolean(section, config_key, fallback=False):
+                    cb.select()
+            elif widget_type == "entry":
+                entry = ctk.CTkEntry(master=self.MiscFrame, height=20, width=25)
+                entry.insert('end', self.config.get(section, config_key, fallback='0'))
+                entry.place(x=200, y=y)
+                self.activity_widgets[config_key] = entry
+            y += y_offset
                 
         # Save button
         self.activitySaveButton = ctk.CTkButton(
@@ -888,7 +960,7 @@ class ActivityWindow(ctk.CTkToplevel):
             width=120,
             command=self.activity_save
         )
-        self.activitySaveButton.place(x=320, y=600)
+        self.activitySaveButton.place(x=320, y=520)
         
     def activity_save(self) -> None:
         """Save all settings"""
@@ -906,6 +978,12 @@ class ActivityWindow(ctk.CTkToplevel):
                 
         for config_key, cb in self.events_widgets.items():
             self.config.set('EVENTS', config_key, 'True' if cb.get() else 'False')
+        
+        for config_key, widget in self.bounties_widgets.items():
+            if isinstance(widget, ctk.CTkCheckBox):
+                self.config.set('BOUNTIES', config_key, 'True' if widget.get() else 'False')
+            else:
+                self.config.set('BOUNTIES', config_key, widget.get())
             
         self.config.save()
         self.destroy()
@@ -934,18 +1012,39 @@ class ShopWindow(ctk.CTkToplevel):
         self.shopDiamondFrame.place(x=220, y=10)
         ctk.CTkLabel(master=self.shopDiamondFrame, text="Diamond Purchases:", font=("Arial", 15, 'bold')).place(x=10, y=5)
         
-        shop_items = {
-            'dust': (self.shopGoldFrame, 'Dust', 40),
-            'essence': (self.shopGoldFrame, 'Essence', 70),
-            'elite_soulstone': (self.shopDiamondFrame, 'Elite Soulstone', 40),
-            'rare_soulstone': (self.shopDiamondFrame, 'Rare Soulstone', 70),
-            'poe_coins': (self.shopGoldFrame, 'POE Coins', 100),
-        }
+        gold_items = [
+            ('shards_gold', 'Shards', 40),
+            ('dust', 'Dust', 70),
+            ('silver_emblem', 'Silver Emblems', 100),
+            ('gold_emblem', 'Gold Emblems', 130),
+            ('poe_coins', 'POE Coins', 160),
+        ]
         
-        for key, (frame, text, y) in shop_items.items():
-            label = ctk.CTkLabel(master=frame, text=text)
+        diamond_items = [
+            ('timegazer', 'Timegazer Card', 40),
+            ('arcanestaffs', 'Arcane Staffs', 70),
+            ('baits', 'Baits', 100),
+            ('cores', 'Cores', 130),
+            ('dust_diamond', 'Dust', 160),
+            ('elite_soulstone', 'Elite Soulstone', 190),
+            ('rare_soulstone', 'Rare Soulstone', 220),
+            ('superb_soulstone', 'Superb Soulstone', 250),
+            ('quick', 'Ignore above, do quickbuy', 350),
+        ]
+        
+        for key, text, y in gold_items:
+            label = ctk.CTkLabel(master=self.shopGoldFrame, text=text)
             label.place(x=10, y=y)
-            checkbox = ctk.CTkCheckBox(master=frame, text=None, onvalue=True, offvalue=False)
+            checkbox = ctk.CTkCheckBox(master=self.shopGoldFrame, text=None, onvalue=True, offvalue=False)
+            checkbox.place(x=165, y=y)
+            self.checkboxes[key] = checkbox
+            if self.config.getboolean('SHOP', key, fallback=False):
+                checkbox.select()
+        
+        for key, text, y in diamond_items:
+            label = ctk.CTkLabel(master=self.shopDiamondFrame, text=text)
+            label.place(x=10, y=y)
+            checkbox = ctk.CTkCheckBox(master=self.shopDiamondFrame, text=None, onvalue=True, offvalue=False)
             checkbox.place(x=165, y=y)
             self.checkboxes[key] = checkbox
             if self.config.getboolean('SHOP', key, fallback=False):
@@ -975,7 +1074,7 @@ class AdvancedWindow(ctk.CTkToplevel):
     
     def __init__(self, parent):
         super().__init__(parent)
-        self.geometry("350x370")
+        self.geometry("350x430")
         self.resizable(False, False)  # Disable window resizing
         self.title('Advanced Options')
         self.attributes("-topmost", True)
@@ -984,7 +1083,7 @@ class AdvancedWindow(ctk.CTkToplevel):
         self.entries = {}
         self.checkboxes = {}
         
-        self.advancedFrame = ctk.CTkFrame(master=self, width=330, height=310)
+        self.advancedFrame = ctk.CTkFrame(master=self, width=330, height=370)
         self.advancedFrame.place(x=10, y=10)
         
         ctk.CTkLabel(
@@ -1007,19 +1106,42 @@ class AdvancedWindow(ctk.CTkToplevel):
         self.multiplier_entry.place(x=275, y=70)
         self.entries['loadingMuliplier'] = self.multiplier_entry
         
+        # Victory Check Frequency
+        ctk.CTkLabel(master=self.advancedFrame, text='Victory Check Frequency:').place(x=10, y=100)
+        self.victory_entry = ctk.CTkEntry(master=self.advancedFrame, height=25, width=45)
+        self.victory_entry.insert('end', self.config.get('PUSH', 'victoryCheck', fallback='1'))
+        self.victory_entry.place(x=275, y=100)
+        self.entries['victoryCheck'] = self.victory_entry
+        
+        # Suppress victory check spam
+        ctk.CTkLabel(master=self.advancedFrame, text='Suppress victory check spam?').place(x=10, y=130)
+        self.suppress_cb = ctk.CTkCheckBox(master=self.advancedFrame, text=None, onvalue=True, offvalue=False)
+        self.suppress_cb.place(x=295, y=130)
+        if self.config.getboolean('PUSH', 'suppressSpam', fallback=False):
+            self.suppress_cb.select()
+        self.checkboxes['suppressSpam'] = self.suppress_cb
+        
+        # Use popular formations
+        ctk.CTkLabel(master=self.advancedFrame, text='Use popular formations').place(x=10, y=160)
+        self.popular_cb = ctk.CTkCheckBox(master=self.advancedFrame, text=None, onvalue=True, offvalue=False)
+        self.popular_cb.place(x=295, y=160)
+        if self.config.getboolean('ADVANCED', 'popularformations', fallback=False):
+            self.popular_cb.select()
+        self.checkboxes['popularformations'] = self.popular_cb
+        
         # Debug
-        ctk.CTkLabel(master=self.advancedFrame, text='Debug Mode').place(x=10, y=100)
+        ctk.CTkLabel(master=self.advancedFrame, text='Debug Mode').place(x=10, y=190)
         self.debug_cb = ctk.CTkCheckBox(master=self.advancedFrame, text=None, onvalue=True, offvalue=False)
-        self.debug_cb.place(x=295, y=100)
+        self.debug_cb.place(x=295, y=190)
         if self.config.getboolean('ADVANCED', 'debug', fallback=False):
             self.debug_cb.select()
         self.checkboxes['debug'] = self.debug_cb
         
         # Emulator path
-        ctk.CTkLabel(master=self.advancedFrame, text='Emulator path:').place(x=10, y=130)
+        ctk.CTkLabel(master=self.advancedFrame, text='Emulator path:').place(x=10, y=220)
         self.emulator_entry = ctk.CTkEntry(master=self.advancedFrame, height=25, width=100)
         self.emulator_entry.insert('end', self.config.get('ADVANCED', 'emulatorpath', fallback=''))
-        self.emulator_entry.place(x=220, y=130)
+        self.emulator_entry.place(x=220, y=220)
         self.entries['emulatorpath'] = self.emulator_entry
         
         # Save button
@@ -1031,15 +1153,21 @@ class AdvancedWindow(ctk.CTkToplevel):
             width=120,
             command=self.advanced_save
         )
-        self.saveButton.place(x=110, y=330)
+        self.saveButton.place(x=110, y=390)
         
     def advanced_save(self) -> None:
         """Save advanced settings"""
         for key, entry in self.entries.items():
-            self.config.set('ADVANCED', key, entry.get())
+            if key == 'victoryCheck':
+                self.config.set('PUSH', key, entry.get())
+            else:
+                self.config.set('ADVANCED', key, entry.get())
             
         for key, cb in self.checkboxes.items():
-            self.config.set('ADVANCED', key, 'True' if cb.get() else 'False')
+            if key == 'suppressSpam':
+                self.config.set('PUSH', key, 'True' if cb.get() else 'False')
+            else:
+                self.config.set('ADVANCED', key, 'True' if cb.get() else 'False')
             
         self.config.save()
         self.destroy()
