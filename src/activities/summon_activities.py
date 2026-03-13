@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 class SummonActivities(BaseActivity):
     """Handles hero summoning"""
     
-    def execute(self):
+    def execute(self) -> bool:
         """Execute summon activities"""
         self.logger.info("Starting summon activities...")
         

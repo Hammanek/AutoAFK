@@ -21,12 +21,12 @@ class BaseActivity:
         self.config = config
         self.notifier = notifier
         
-    def wait(self, seconds: float = 1):
+    def wait(self, seconds: float = 1) -> None:
         """Wait with loading multiplier from config"""
         multiplier = float(self.config.get('ADVANCED', 'loadingMuliplier', fallback='1.0'))
         time.sleep(seconds * multiplier)
     
-    def notify(self, message: str, level: str = 'INFO'):
+    def notify(self, message: str, level: str = 'INFO') -> None:
         """Send notification"""
         if self.notifier:
             self.notifier.send(message, level)

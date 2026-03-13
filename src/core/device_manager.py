@@ -242,15 +242,15 @@ class DeviceManager:
         """Get current screen as numpy array"""
         return np.asarray(self.get_screenshot())
         
-    def tap(self, x: int, y: int):
+    def tap(self, x: int, y: int) -> None:
         """Tap at coordinates"""
         self.device.input_tap(x, y)
         
-    def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int = 100):
+    def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int = 100) -> None:
         """Swipe from (x1,y1) to (x2,y2)"""
         self.device.shell(f"input swipe {x1} {y1} {x2} {y2} {duration}")
         
-    def long_press(self, x: int, y: int, duration_ms: int = 1000):
+    def long_press(self, x: int, y: int, duration_ms: int = 1000) -> None:
         """Long press at coordinates"""
         self.device.shell(f"input swipe {x} {y} {x} {y} {duration_ms}")
         
@@ -296,7 +296,7 @@ class DeviceManager:
         package_name = 'com.lilithgames.hgame.gp.id' if test_mode else 'com.lilithgame.hgame.gp'
         return self.start_app(package_name)
         
-    def disconnect(self):
+    def disconnect(self) -> None:
         """Disconnect from device"""
         self.connected = False
         logger.info("Disconnected from device")

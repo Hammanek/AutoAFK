@@ -10,12 +10,12 @@ from typing import Optional
 # Global device manager for screenshot capture
 _device_manager = None
 
-def set_device_manager(device_manager):
+def set_device_manager(device_manager) -> None:
     """Set global device manager for screenshot capture on errors"""
     global _device_manager
     _device_manager = device_manager
 
-def add_notification_handler(notification_manager):
+def add_notification_handler(notification_manager) -> None:
     """Add notification handler to send logs to Discord/Telegram"""
     if notification_manager:
         handler = NotificationHandler(notification_manager)
@@ -36,7 +36,7 @@ logging.addLevelName(PURPLE, 'PURPLE')
 class ColoredFormatter(logging.Formatter):
     """Custom formatter with timestamps and clean output"""
     
-    def format(self, record):
+    def format(self, record) -> str:
         # Add timestamp
         timestamp = datetime.now().strftime('%H:%M:%S')
         
@@ -50,7 +50,7 @@ class ColoredFormatter(logging.Formatter):
 class ScreenshotOnErrorHandler(logging.Handler):
     """Handler that saves screenshot on ERROR level logs"""
     
-    def emit(self, record):
+    def emit(self, record) -> None:
         """Save screenshot when error is logged"""
         global _device_manager
         
@@ -98,7 +98,7 @@ class NotificationHandler(logging.Handler):
         super().__init__()
         self.notification_manager = notification_manager
         
-    def emit(self, record):
+    def emit(self, record) -> None:
         """Send log message to notification services"""
         if not self.notification_manager:
             return
@@ -115,17 +115,17 @@ class NotificationHandler(logging.Handler):
 
 
 # Add custom methods to Logger class
-def blue(self, message, *args, **kwargs):
+def blue(self, message, *args, **kwargs) -> None:
     """Log message in blue (action start)"""
     if self.isEnabledFor(BLUE):
         self._log(BLUE, message, args, **kwargs)
 
-def green(self, message, *args, **kwargs):
+def green(self, message, *args, **kwargs) -> None:
     """Log message in green (success)"""
     if self.isEnabledFor(GREEN):
         self._log(GREEN, message, args, **kwargs)
 
-def purple(self, message, *args, **kwargs):
+def purple(self, message, *args, **kwargs) -> None:
     """Log message in purple (special actions)"""
     if self.isEnabledFor(PURPLE):
         self._log(PURPLE, message, args, **kwargs)

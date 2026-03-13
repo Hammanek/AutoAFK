@@ -65,7 +65,7 @@ class Config:
         """Get boolean configuration value"""
         return self.config.getboolean(section, option, fallback=fallback)
         
-    def set(self, section: str, option: str, value: Any):
+    def set(self, section: str, option: str, value: Any) -> None:
         """Set configuration value"""
         if not self.config.has_section(section):
             self.config.add_section(section)
@@ -79,11 +79,11 @@ class Config:
         """Check if option exists"""
         return self.config.has_option(section, option)
         
-    def save(self):
+    def save(self) -> None:
         """Save configuration to file"""
         with open(self.config_path, 'w') as f:
             self.config.write(f)
             
-    def reload(self):
+    def reload(self) -> None:
         """Reload configuration from file"""
         self.config.read(self.config_path)

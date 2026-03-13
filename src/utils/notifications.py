@@ -41,7 +41,7 @@ class NotificationManager:
                 self.telegram = TelegramNotifier(bot_token, chat_id, disable_notification)
                 logger.info("Telegram notifications enabled")
                 
-    def send(self, message: str, level: str = 'INFO'):
+    def send(self, message: str, level: str = 'INFO') -> None:
         """Send notification to all enabled services"""
         # Clean message for external services
         cleaned_message = self._clean_message(message)
@@ -67,7 +67,7 @@ class NotificationManager:
             except Exception:
                 pass  # Silently ignore notification failures
     
-    def send_notification(self, title: str, message: str):
+    def send_notification(self, title: str, message: str) -> None:
         """Send Windows desktop notification"""
         try:
             from plyer import notification

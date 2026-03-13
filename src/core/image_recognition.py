@@ -265,7 +265,7 @@ class ImageRecognition:
         except Exception as e:
             logger.debug(f"Failed to save debug screenshot: {e}")
     
-    def save_error_screenshot(self, error_message: str):
+    def save_error_screenshot(self, error_message: str) -> None:
         """Public method to save screenshot when error occurs
         
         Args:

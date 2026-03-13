@@ -78,7 +78,7 @@ class GameController:
         self.image = image_recognition
         self.config = config
         
-    def tap(self, x: int, y: int, seconds: float = 1, random_shift: int = 0):
+    def tap(self, x: int, y: int, seconds: float = 1, random_shift: int = 0) -> None:
         """Tap at coordinates with optional random shift"""
         if random_shift > 0:
             x += random.randint(0, random_shift)
@@ -86,12 +86,12 @@ class GameController:
         self.device.tap(x, y)
         self.wait(seconds)
         
-    def long_press(self, x: int, y: int, duration_ms: int = 1000, seconds: float = 1):
+    def long_press(self, x: int, y: int, duration_ms: int = 1000, seconds: float = 1) -> None:
         """Long press at coordinates"""
         self.device.long_press(x, y, duration_ms)
         self.wait(seconds)
         
-    def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int = 100, seconds: float = 1):
+    def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int = 100, seconds: float = 1) -> None:
         """Swipe from point to point"""
         try:
             self.device.swipe(x1, y1, x2, y2, duration)
@@ -170,12 +170,12 @@ class GameController:
                 logger.error("Recovery failed")
             return False
         
-    def expand_menus(self):
+    def expand_menus(self) -> None:
         """Expand collapsed side menus"""
         while self.image.is_visible('buttons/downarrow', confidence=0.8, suppress=True, click=True, retry=3):
             pass
             
-    def wait_until_game_active(self):
+    def wait_until_game_active(self) -> None:
         """Wait for game to load and navigate to campaign"""
         logger.info("Waiting for game to load...")
         
@@ -271,7 +271,7 @@ class GameController:
         # Default to victory if unclear
         return True
         
-    def wait(self, seconds: float = 1):
+    def wait(self, seconds: float = 1) -> None:
         """Wait with loading multiplier"""
         multiplier = float(self.config.get('ADVANCED', 'loadingMuliplier', fallback='1.0'))
         time.sleep(seconds * multiplier)
