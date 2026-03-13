@@ -258,9 +258,7 @@ class DailyActivities(BaseActivity):
         
         self.controller.tap(1000, 500, seconds=3)
         
-        if self.image.is_visible('buttons/batchselect', retry=3):
-            self.image.click_image('buttons/batchselect')
-            
+        if self.image.is_visible('buttons/batchselect', click=True, retry=3):
             if self.image.is_visible('buttons/confirm_grey'):
                 logger.warning("Nothing selected/available! Returning...")
                 self.image.click_image('buttons/back', region=self.controller.BOUNDARIES['backMenu'])
