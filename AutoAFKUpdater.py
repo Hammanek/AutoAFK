@@ -12,25 +12,10 @@ import subprocess
 import time
 from pathlib import Path
 
-# Try to import GitHub repo from main.py, otherwise use default
-try:
-    # Try to read from main.py if it exists
-    if os.path.exists('main.py'):
-        with open('main.py', 'r', encoding='utf-8') as f:
-            content = f.read()
-            # Extract GITHUB_REPO value
-            for line in content.split('\n'):
-                if line.startswith('GITHUB_REPO = '):
-                    GITHUB_REPO = line.split('=')[1].strip().strip('"').strip("'")
-                    break
-            else:
-                GITHUB_REPO = "Hammanek/AutoAFK"
-    else:
-        GITHUB_REPO = "Hammanek/AutoAFK"
-except:
-    GITHUB_REPO = "Hammanek/AutoAFK"
-
+# GitHub Repository - ALWAYS focus on Hammanek/AutoAFK
+GITHUB_REPO = "Hammanek/AutoAFK"
 GITHUB_API_URL = f"https://api.github.com/repos/{GITHUB_REPO}/releases/latest"
+
 
 
 def print_header():
@@ -175,9 +160,9 @@ def install_update(extract_dir, backup_dir):
         print("[INFO] Removing old files...")
         items_to_remove = []
         for item in os.listdir(current_dir):
-            # Skip settings.ini, update.bat, and backup folders
-            if item in ['settings.ini', 'update.bat', 
-                       'settings.ini.backup', 'debug', 'logs']:
+            # Skip settings.ini, update.bat, backup folders, and updater files
+            if item in ['settings.ini', 'update.bat', 'AutoAFKUpdater.exe', 'AutoAFKUpdater.py', 
+                       'settings.ini.backup', 'debug', 'logs', '_internal']:
                 continue
             
             item_path = os.path.join(current_dir, item)
@@ -203,37 +188,30 @@ def install_update(extract_dir, backup_dir):
             if item == 'settings.ini' and os.path.exists(dst):
                 continue
             
-            # Special handling for _internal folder (preserve updater)
+            # Special handling for _internal folder (ensure full update)
             if item == '_internal':
-                # Copy _internal but preserve the updater
                 if os.path.exists(dst):
-                    # Backup current updater
-                    updater_exe_backup = None
-                    updater_py_backup = None
-                    
-                    updater_exe_path = os.path.join(dst, 'updater.exe')
-                    updater_py_path = os.path.join(dst, 'updater.py')
-                    
-                    if os.path.exists(updater_exe_path):
-                        updater_exe_backup = updater_exe_path + '.backup'
-                        shutil.copy2(updater_exe_path, updater_exe_backup)
-                    
-                    if os.path.exists(updater_py_path):
-                        updater_py_backup = updater_py_path + '.backup'
-                        shutil.copy2(updater_py_path, updater_py_backup)
-                    
-                    # Remove old _internal
-                    shutil.rmtree(dst)
-                    
-                    # Copy new _internal
-                    shutil.copytree(src, dst)
-                    
-                    # Restore updater from backup
-                    if updater_exe_backup and os.path.exists(updater_exe_backup):
-                        shutil.move(updater_exe_backup, updater_exe_path)
-                    
-                    if updater_py_backup and os.path.exists(updater_py_backup):
-                        shutil.move(updater_py_backup, updater_py_path)
+                    print(f"[INFO] Updating _internal contents...")
+                    # Copy all files from new _internal to old _internal
+                    for subitem in os.listdir(src):
+                        s_sub = os.path.join(src, subitem)
+                        d_sub = os.path.join(dst, subitem)
+                        
+                        try:
+                            if os.path.isdir(s_sub):
+                                if os.path.exists(d_sub):
+                                    shutil.rmtree(d_sub)
+                                shutil.copytree(s_sub, d_sub)
+                            else:
+                                # Try to overwrite
+                                try:
+                                    shutil.copy2(s_sub, d_sub)
+                                except PermissionError:
+                                    # If file is in use (like the running updater), stage as .new
+                                    print(f"[INFO] Staging {subitem} for next run...")
+                                    shutil.copy2(s_sub, d_sub + ".new")
+                        except Exception as e:
+                            print(f"[WARNING] Could not update {subitem}: {e}")
                 else:
                     # No existing _internal, just copy
                     shutil.copytree(src, dst)
@@ -255,9 +233,9 @@ def install_update(extract_dir, backup_dir):
         print(f"[INFO] Installed {copied_count} new items")
         
         # Restore settings.ini from backup
-        backup_settings = os.path.join(backup_dir, 'settings.ini')
-        if os.path.exists(backup_settings):
-            shutil.copy2(backup_settings, os.path.join(current_dir, 'settings.ini'))
+        backup_settings_file = os.path.join(backup_dir, 'settings.ini')
+        if os.path.exists(backup_settings_file):
+            shutil.copy2(backup_settings_file, os.path.join(current_dir, 'settings.ini'))
             print("[INFO] Settings restored")
         
         print("[INFO] Installation complete!")
@@ -271,15 +249,21 @@ def restart_bot():
     """Restart AutoAFK.exe"""
     print("[7/7] Restarting bot...")
     try:
+        # Check current dir and parent dir
         exe_path = os.path.join(os.getcwd(), 'AutoAFK.exe')
         
+        if not os.path.exists(exe_path):
+             # Try parent dir (if running from _internal)
+             exe_path = os.path.join(os.path.dirname(os.getcwd()), 'AutoAFK.exe')
+             
         if not os.path.exists(exe_path):
             print("[ERROR] AutoAFK.exe not found!")
             return False
         
         # Start bot in background
+        print(f"[INFO] Starting: {exe_path}")
         if sys.platform == 'win32':
-            subprocess.Popen([exe_path], shell=False)
+            subprocess.Popen([exe_path], shell=False, creationflags=subprocess.CREATE_NEW_CONSOLE)
         else:
             subprocess.Popen([exe_path])
         
@@ -289,6 +273,7 @@ def restart_bot():
         print(f"[ERROR] Failed to restart bot: {e}")
         print("[INFO] Please start AutoAFK.exe manually")
         return False
+
 
 
 def restore_backup(backup_dir):
@@ -309,17 +294,27 @@ def main():
     """Main updater function"""
     print_header()
     
-    # Determine working directory (parent of _internal if running from there)
-    if '_internal' in os.getcwd():
-        # Running from _internal folder, go up one level
+    # Determine working directory
+    # 1. If we are running as a frozen EXE
+    if getattr(sys, 'frozen', False):
+        exe_dir = os.path.dirname(sys.executable)
+        if os.path.basename(exe_dir) == '_internal':
+            os.chdir(os.path.dirname(exe_dir))
+        else:
+            os.chdir(exe_dir)
+    # 2. If we are running as a script and in _internal
+    elif '_internal' in os.getcwd():
         os.chdir('..')
     
     # Check if we're in the right directory
-    if not os.path.exists('AutoAFK.exe'):
-        print("[ERROR] AutoAFK.exe not found!")
+    if not os.path.exists('AutoAFK.exe') and not os.path.exists('main.py'):
+        print("[ERROR] Application not found!")
+        print(f"[DEBUG] Current directory: {os.getcwd()}")
         print("[INFO] Please run updater from AutoAFK directory")
         input("Press Enter to exit...")
         return 1
+
+
     
     # Get latest release
     version, download_url = get_latest_release()

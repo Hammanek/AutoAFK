@@ -1,15 +1,29 @@
 @echo off
 REM AutoAFK Updater Launcher
 
+REM Check for self-updates and other staged files first
+for /r "_internal" %%f in (*.new) do (
+    set "target=%%~dpnf"
+    echo [INFO] Applying update to %%~nxf...
+    del "!target!" >nul 2>&1
+    move "%%f" "!target!" >nul 2>&1
+)
+
+if exist "AutoAFKUpdater.py.new" (
+    echo [INFO] Applying updater update...
+    del "AutoAFKUpdater.py" >nul 2>&1
+    move "AutoAFKUpdater.py.new" "AutoAFKUpdater.py" >nul 2>&1
+)
+
 REM Try compiled updater first (in _internal folder)
-if exist "_internal\updater.exe" (
-    _internal\updater.exe
+if exist "_internal\AutoAFKUpdater.exe" (
+    _internal\AutoAFKUpdater.exe
     exit /b %ERRORLEVEL%
 )
 
-REM Fallback to Python version (in _internal folder)
-if exist "_internal\updater.py" (
-    echo [INFO] Using Python updater (updater.exe not found)
+REM Fallback to Python version
+if exist "_internal\AutoAFKUpdater.py" (
+    echo [INFO] Using Python updater
     
     REM Check Python
     python --version >nul 2>&1
@@ -27,9 +41,17 @@ if exist "_internal\updater.py" (
         python -m pip install requests --quiet
     )
     
-    python _internal\updater.py
+    python _internal\AutoAFKUpdater.py
     exit /b %ERRORLEVEL%
 )
+
+if exist "AutoAFKUpdater.py" (
+    echo [INFO] Using Python updater
+    python AutoAFKUpdater.py
+    exit /b %ERRORLEVEL%
+)
+
+
 
 echo [ERROR] Updater not found in _internal folder!
 pause

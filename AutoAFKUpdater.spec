@@ -3,7 +3,7 @@
 block_cipher = None
 
 a = Analysis(
-    ['updater.py'],
+    ['AutoAFKUpdater.py'],
     pathex=[],
     binaries=[],
     datas=[],
@@ -29,7 +29,8 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='updater',
+    name='AutoAFKUpdater',
+
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

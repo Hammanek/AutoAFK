@@ -34,21 +34,25 @@ echo.
 echo [2/9] Cleaning previous builds...
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
-if exist updater.exe del /q updater.exe
+if exist AutoAFKUpdater.exe del /q AutoAFKUpdater.exe
+
 echo       Cleaned
 echo.
 
 echo [3/9] Building updater...
-echo       Compiling updater.exe...
-pyinstaller updater.spec --clean >nul 2>&1
+echo       Compiling AutoAFKUpdater.exe...
+pyinstaller AutoAFKUpdater.spec --clean >nul 2>&1
 if errorlevel 1 (
     echo       [WARNING] Updater build failed
     set UPDATER_BUILT=0
 ) else (
-    copy dist\updater.exe . >nul 2>&1
-    echo       ✓ updater.exe compiled
+    copy dist\AutoAFKUpdater.exe . >nul 2>&1
+    echo       ✓ AutoAFKUpdater.exe compiled
     set UPDATER_BUILT=1
 )
+
+
+
 echo.
 
 echo [4/9] Cleaning for main build...
@@ -79,12 +83,15 @@ if exist LICENSE copy LICENSE dist\AutoAFK\ >nul
 
 REM Copy updater to _internal folder
 if !UPDATER_BUILT! == 1 (
-    copy updater.exe dist\AutoAFK\_internal\ >nul
-    echo       Copied updater.exe to _internal
+    copy AutoAFKUpdater.exe dist\AutoAFK\_internal\ >nul
+    echo       Copied AutoAFKUpdater.exe to _internal
 ) else (
-    copy updater.py dist\AutoAFK\_internal\ >nul
-    echo       Copied updater.py to _internal
+    copy AutoAFKUpdater.py dist\AutoAFK\_internal\ >nul
+    echo       Copied AutoAFKUpdater.py to _internal
 )
+
+
+
 
 REM Copy update.bat to main folder (launcher for updater)
 copy update.bat dist\AutoAFK\ >nul
@@ -93,7 +100,8 @@ echo.
 
 echo [7/9] Cleaning build artifacts...
 if exist build rmdir /s /q build
-if exist updater.exe del /q updater.exe
+if exist AutoAFKUpdater.exe del /q AutoAFKUpdater.exe
+
 echo       Build folder cleaned
 echo.
 
@@ -135,10 +143,13 @@ echo   - dist\AutoAFK\AutoAFK.exe  (Main executable)
 echo   - dist\AutoAFK\_internal\   (Required libraries)
 
 if !UPDATER_BUILT! == 1 (
-    echo   - dist\AutoAFK\updater.exe  (Updater - no Python needed!)
+    echo   - dist\AutoAFK\AutoAFKUpdater.exe  (Updater - no Python needed!)
 ) else (
-    echo   - dist\AutoAFK\updater.py   (Updater - requires Python)
+    echo   - dist\AutoAFK\AutoAFKUpdater.py   (Updater - requires Python)
 )
+
+
+
 
 echo   - dist\AutoAFK.zip          (Distribution package - !SIZE_MB! MB)
 echo.
@@ -149,10 +160,13 @@ echo   - Configuration template
 echo   - ADB tools (adb.exe, AdbWinApi.dll)
 
 if !UPDATER_BUILT! == 1 (
-    echo   - Updater (updater.exe - fully compiled!)
+    echo   - Updater (AutoAFKUpdater.exe - fully compiled!)
 ) else (
-    echo   - Updater (updater.py - requires Python)
+    echo   - Updater (AutoAFKUpdater.py - requires Python)
 )
+
+
+
 
 echo   - Documentation
 echo.
@@ -168,6 +182,8 @@ if !UPDATER_BUILT! == 1 (
 ) else (
     echo Note: Updater requires Python - users need Python 3.8+ for updates
 )
+
+
 
 echo.
 pause
