@@ -172,8 +172,8 @@ class GameController:
         
     def expand_menus(self):
         """Expand collapsed side menus"""
-        while self.image.is_visible('buttons/downarrow', confidence=0.8, suppress=True):
-            self.image.click_image('buttons/downarrow', confidence=0.8, retry=3)
+        while self.image.is_visible('buttons/downarrow', confidence=0.8, suppress=True, click=True, retry=3):
+            pass
             
     def wait_until_game_active(self):
         """Wait for game to load and navigate to campaign"""
