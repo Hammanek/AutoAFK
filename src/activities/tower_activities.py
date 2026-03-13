@@ -263,9 +263,7 @@ class TowerActivities(BaseActivity):
                                    region=(580, 1208, 300, 150),
                                    secure_region=(200, 578, 684, 178))
             return
-        elif self.image.is_visible('buttons/formations', region=(914, 1762, 102, 134)):
-            self.image.click_image('buttons/formations', seconds=3, retry=5,
-                                  region=(914, 1762, 102, 134))
+        elif self.image.is_visible('buttons/formations', region=(914, 1762, 102, 134), click=True, seconds=3, retry=5):
             
             if self.config.getboolean('ADVANCED', 'popularformations', fallback=False):
                 self.controller.tap(800, 1650, seconds=2)  # Change to 'Popular' tab

@@ -109,9 +109,7 @@ class CampaignActivities(BaseActivity):
             return True
         
         # Check if formations button is visible
-        if self.image.is_visible('buttons/formations', region=(914, 1762, 102, 134)):
-            self.image.click_image('buttons/formations', seconds=3, retry=5, 
-                                  region=(914, 1762, 102, 134), retry_interval=0.3)
+        if self.image.is_visible('buttons/formations', region=(914, 1762, 102, 134), click=True, seconds=3, retry=5, retry_interval=0.3):
             
             # Switch to Popular tab if enabled
             if self.config.getboolean('ADVANCED', 'popularformations', fallback=False):

@@ -21,8 +21,7 @@ class GuildActivities(BaseActivity):
         
         # Collect guild reward chests
         self.image.click_image('buttons/guild_chests', seconds=2)
-        if self.image.is_visible('buttons/collect_guildchest'):
-            self.image.click_image('buttons/collect_guildchest')
+        if self.image.is_visible('buttons/collect_guildchest', click=True):
             self.controller.tap(550, 1300)
             self.controller.tap(900, 550)
             self.controller.tap(550, 1800)
@@ -44,8 +43,7 @@ class GuildActivities(BaseActivity):
             if current_day in (1, 2):
                 self.controller.tap(85, 140)  # Leaderboard
                 
-                if self.image.is_visible('buttons/detail', region=(912, 514, 100, 100)):
-                    self.image.click_image('buttons/detail', region=(912, 514, 100, 100), seconds=3)
+                if self.image.is_visible('buttons/detail', region=(912, 514, 100, 100), click=True, seconds=3):
                     self.controller.tap(230, 625)  # First attempt
                     self.controller.tap(90, 290)  # Copy formation
                     self.image.click_image('buttons/confirm', seconds=2, suppress=True)
@@ -53,8 +51,7 @@ class GuildActivities(BaseActivity):
                     self.controller.tap(300, 50)  # Clear popup
                     self.image.click_image('buttons/back', seconds=2, retry=3)
                     
-                    if self.image.is_visible('buttons/challenge_tr', confidence=0.7, retry=3):
-                        self.image.click_image('buttons/challenge_tr', confidence=0.7, seconds=5)
+                    if self.image.is_visible('buttons/challenge_tr', confidence=0.7, retry=3, click=True, seconds=5):
                         self.controller.tap(70, 1090)  # Formations
                         
                         # Swipe down to copied formation
@@ -68,8 +65,7 @@ class GuildActivities(BaseActivity):
                         self.controller.long_press(620, 1650)  # Long press for options
                         self.image.click_image('buttons/delete_formation')
                         
-                        if self.image.is_visible('buttons/battle_large', confidence=0.7, retry=3):
-                            self.image.click_image('buttons/battle_large', confidence=0.7, seconds=5)
+                        if self.image.is_visible('buttons/battle_large', confidence=0.7, retry=3, click=True, seconds=5):
                             self.image.click_image('buttons/skip', retry=5, confidence=0.8, 
                                                   suppress=True, region=self.controller.BOUNDARIES['skipAoH'])
                             self.controller.tap(550, 1800)
@@ -84,12 +80,10 @@ class GuildActivities(BaseActivity):
             # Do 2 more HF battles
             if hf_ok:
                 for _ in range(2):
-                    if self.image.is_visible('buttons/challenge_tr', confidence=0.7, retry=3):
-                        self.image.click_image('buttons/challenge_tr', confidence=0.7, seconds=5)
+                    if self.image.is_visible('buttons/challenge_tr', confidence=0.7, retry=3, click=True, seconds=5):
                         self.controller.tap(600, 1100)  # 2nd team
                         
-                        if self.image.is_visible('buttons/battle_large', confidence=0.7, retry=3):
-                            self.image.click_image('buttons/battle_large', confidence=0.7, seconds=5)
+                        if self.image.is_visible('buttons/battle_large', confidence=0.7, retry=3, click=True, seconds=5):
                             self.controller.tap(760, 1460, seconds=3)
                             self.controller.tap(550, 1800)
                         else:
@@ -122,8 +116,8 @@ class GuildActivities(BaseActivity):
                 self.controller.tap(725, 1300)
                 
                 # Handle capped resources screen
-                if self.image.is_visible('buttons/confirm'):
-                    self.image.click_image('buttons/confirm')
+                if self.image.is_visible('buttons/confirm', click=True):
+                    pass
                     
                 self.controller.tap(550, 500)
                 self.controller.tap(550, 500, seconds=2)
@@ -144,8 +138,7 @@ class GuildActivities(BaseActivity):
                     self.image.is_visible('buttons/open', retry=3)):
                     self.controller.tap(540, 1830)  # Activate Soren
                     
-                    if self.image.is_visible('buttons/confirm_soren'):
-                        self.image.click_image('buttons/confirm_soren')
+                    if self.image.is_visible('buttons/confirm_soren', click=True):
                         logger.green("    Soren activated")
                     else:
                         self.controller.tap(100, 1700)  # Clear popup
@@ -158,8 +151,8 @@ class GuildActivities(BaseActivity):
                 self.controller.tap(725, 1300)
                 
                 # Handle capped resources screen
-                if self.image.is_visible('buttons/confirm'):
-                    self.image.click_image('buttons/confirm')
+                if self.image.is_visible('buttons/confirm', click=True):
+                    pass
                     
                 self.controller.tap(550, 500)
                 self.controller.tap(550, 500, seconds=2)

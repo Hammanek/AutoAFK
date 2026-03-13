@@ -19,8 +19,7 @@ class ArenaActivities(BaseActivity):
         self.controller.tap(740, 1050)
         self.controller.tap(550, 50)  # Clear tickets popup
         
-        if self.image.is_visible('labels/arenaofheroes'):
-            self.image.click_image('labels/arenaofheroes', suppress=True)
+        if self.image.is_visible('labels/arenaofheroes', click=True, suppress=True):
             self.wait(1)
             self.image.click_image('buttons/challenge', retry=3, 
                                   region=self.controller.BOUNDARIES['challengeAoH'])
@@ -81,8 +80,7 @@ class ArenaActivities(BaseActivity):
         # Scroll down to find Legends Tournament
         self.controller.swipe(550, 800, 550, 500, duration=200, seconds=2)
         
-        if self.image.is_visible('labels/legendstournament_new', suppress=True):
-            self.image.click_image('labels/legendstournament_new', suppress=True)
+        if self.image.is_visible('labels/legendstournament_new', suppress=True, click=True):
             self.controller.tap(550, 300, seconds=2)
             self.controller.tap(50, 1850)
             self.image.click_image('buttons/back', region=self.controller.BOUNDARIES['backMenu'])
@@ -113,12 +111,10 @@ class ArenaActivities(BaseActivity):
         ]
         
         for banner in ts_banners:
-            if self.image.is_visible(banner, confidence=0.8):
-                self.image.click_image(banner, confidence=0.8)
+            if self.image.is_visible(banner, confidence=0.8, click=True):
                 self.wait(2)
                 
-                if self.image.is_visible('buttons/ts_path'):
-                    self.image.click_image('buttons/ts_path')
+                if self.image.is_visible('buttons/ts_path', click=True):
                     self.controller.tap(370, 945)  # Choose path
                     self.controller.tap(520, 1700)  # Confirm
                     self.image.click_image('buttons/back', retry=3, 

@@ -280,8 +280,7 @@ class SummonActivities(BaseActivity):
         # Rent any available mercenaries
         rented = 0
         for _ in range(5):
-            if self.image.is_visible('buttons/apply', suppress=True, retry=1):
-                self.image.click_image('buttons/apply')
+            if self.image.is_visible('buttons/apply', suppress=True, retry=1, click=True):
                 self.wait(1)
                 rented += 1
             else:
