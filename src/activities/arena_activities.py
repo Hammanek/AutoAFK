@@ -16,7 +16,7 @@ class ArenaActivities(BaseActivity):
         
         self.controller.confirm_location('darkforest', 
                                         region=self.controller.BOUNDARIES['darkforestSelect'])
-        self.controller.tap(740, 1100)
+        self.controller.tap(740, 1050)
         self.controller.tap(550, 50)  # Clear tickets popup
         
         if self.image.is_visible('labels/arenaofheroes'):
@@ -75,7 +75,7 @@ class ArenaActivities(BaseActivity):
         
         self.controller.confirm_location('darkforest', 
                                         region=self.controller.BOUNDARIES['darkforestSelect'])
-        self.controller.tap(740, 1100)
+        self.controller.tap(740, 1050)
         self.controller.tap(550, 50)
         
         # Scroll down to find Legends Tournament
@@ -100,7 +100,7 @@ class ArenaActivities(BaseActivity):
         
         self.controller.confirm_location('darkforest', 
                                         region=self.controller.BOUNDARIES['darkforestSelect'])
-        self.controller.tap(750, 1100)
+        self.controller.tap(740, 1050)
         self.controller.tap(550, 50)  # Clear tickets
         self.controller.tap(550, 50)  # Clear overflow
         

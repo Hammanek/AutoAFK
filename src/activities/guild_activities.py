@@ -131,7 +131,7 @@ class GuildActivities(BaseActivity):
                 logger.warning("    Wrizz quick battle not found")
                 
             # Soren
-            self.controller.tap(970, 630)
+            self.controller.tap(970, 890)
             
             # Soren activation (specific days)
             days_str = self.config.get('DAILIES', 'sorenactivate_days', fallback='1,2,3,4,5,6,7')

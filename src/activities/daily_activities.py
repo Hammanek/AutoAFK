@@ -162,7 +162,7 @@ class DailyActivities(BaseActivity):
         
         self.controller.confirm_location('darkforest', 
                                         region=self.controller.BOUNDARIES['darkforestSelect'])
-        self.controller.tap(850, 700)
+        self.controller.tap(800, 700)
         
         # Wait for collect button to appear (max 4s)
         if self.image.wait_for_image('buttons/collect_wide', timeout=4, check_interval=0.3):
