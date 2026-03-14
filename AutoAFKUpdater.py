@@ -117,16 +117,16 @@ def close_running_bot():
     """Try to close running AutoAFK.exe"""
     print("[5/7] Closing running bot...")
     try:
-        # Wait a bit to ensure bot has time to close itself
-        time.sleep(3)
+        # In auto mode the UI closes itself, just wait for it
+        time.sleep(5)
         
-        # Try to kill AutoAFK.exe process
+        # Kill any remaining AutoAFK.exe process as fallback
         if sys.platform == 'win32':
             os.system('taskkill /F /IM AutoAFK.exe >nul 2>&1')
         else:
             os.system('pkill -f AutoAFK')
         
-        time.sleep(2)  # Wait for process to close
+        time.sleep(1)
         print("[INFO] Bot closed")
         return True
     except Exception as e:
@@ -387,12 +387,14 @@ def main():
         if restart_bot():
             print()
             print("[INFO] Update complete! Bot is starting...")
-            time.sleep(2)
+            time.sleep(5)  # Keep window visible so user can see result
         else:
             print()
             print("[INFO] Please start AutoAFK.exe manually")
             if not auto_mode:
                 input("Press Enter to exit...")
+            else:
+                time.sleep(10)  # Keep window visible on failure
         
     except Exception as e:
         print(f"[ERROR] Update failed: {e}")

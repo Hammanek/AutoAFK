@@ -229,10 +229,10 @@ class App(ctk.CTk):
             )
 
             self.textbox.insert('end', '🔄 Updater started in separate window\n', 'orange')
-            self.textbox.insert('end', '⏳ Bot will close in 3 seconds...\n', 'orange')
+            self.textbox.insert('end', '⏳ Bot will close in 5 seconds...\n', 'orange')
             self.textbox.see('end')
             # Give updater time to start before UI closes itself
-            self.after(3000, self.quit)
+            self.after(5000, self.quit)
 
         except Exception as e:
             self.textbox.insert('end', f'❌ Failed to run updater: {e}\n', 'error')
