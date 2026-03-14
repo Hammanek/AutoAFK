@@ -140,30 +140,30 @@ class App(ctk.CTk):
         def check():
             try:
                 update_available, current, latest = VersionChecker.check_for_updates()
+                notes = VersionChecker.get_release_notes(latest) if (latest and update_available) else None
 
-                # Schedule UI updates on main thread
                 def update_ui():
-                    if latest:
-                        if update_available:
-                            self.textbox.insert('end', '⚠️ UPDATE AVAILABLE!\n', 'yellow')
-                            self.textbox.insert('end', f'Current version: {current}\n', 'warning')
-                            self.textbox.insert('end', f'Latest version: {latest}\n\n', 'yellow')
-
-                            notes = VersionChecker.get_release_notes(latest)
-                            if notes:
-                                self.textbox.insert('end', f'Version {latest} changes:\n', 'yellow')
-                                if len(notes) > 500:
-                                    notes = notes[:500] + '...'
-                                self.textbox.insert('end', f'{notes}\n\n', 'warning')
-
-                            if self.config.getboolean('ADVANCED', 'autoupdate', fallback=False):
-                                self.textbox.insert('end', '🔄 Auto-update enabled, starting updater...\n\n', 'orange')
-                                self.after(2000, self._run_updater)
-                            else:
-                                self.textbox.insert('end', '💡 Run update.bat to update or download from:\n', 'blue')
-                                self.textbox.insert('end', f'{VersionChecker.get_download_url()}\n\n', 'blue')
-                    else:
+                    if not latest:
                         self.textbox.insert('end', '⚠️ Could not check for updates\n\n', 'warning')
+                        return
+
+                    if not update_available:
+                        return
+
+                    self.textbox.insert('end', '⚠️ UPDATE AVAILABLE!\n', 'yellow')
+                    self.textbox.insert('end', f'Current version: {current}\n', 'warning')
+                    self.textbox.insert('end', f'Latest version: {latest}\n\n', 'yellow')
+
+                    if notes:
+                        self.textbox.insert('end', f'Version {latest} changes:\n', 'yellow')
+                        self.textbox.insert('end', f'{notes[:500]}{"..." if len(notes) > 500 else ""}\n\n', 'warning')
+
+                    if self.config.getboolean('ADVANCED', 'autoupdate', fallback=False):
+                        self.textbox.insert('end', '🔄 Auto-update enabled, starting updater...\n\n', 'orange')
+                        self.after(2000, self._run_updater)
+                    else:
+                        self.textbox.insert('end', '💡 Run update.bat to update or download from:\n', 'blue')
+                        self.textbox.insert('end', f'{VersionChecker.get_download_url()}\n\n', 'blue')
 
                 self.after(0, update_ui)
             except Exception as e:
@@ -209,11 +209,19 @@ class App(ctk.CTk):
     def _run_updater(self) -> None:
         """Launch updater as a detached process with its own visible console window"""
         try:
-            # Determine updater command
-            if os.path.exists('_internal/AutoAFKUpdater.exe'):
-                cmd = ['_internal/AutoAFKUpdater.exe', '--auto']
-            elif os.path.exists('AutoAFKUpdater.py'):
-                cmd = ['python', 'AutoAFKUpdater.py', '--auto']
+            # Resolve base directory (works for both frozen exe and script)
+            if getattr(sys, 'frozen', False):
+                base_dir = os.path.dirname(sys.executable)
+            else:
+                base_dir = os.path.dirname(os.path.abspath(__file__))
+
+            updater_exe = os.path.join(base_dir, '_internal', 'AutoAFKUpdater.exe')
+            updater_py = os.path.join(base_dir, 'AutoAFKUpdater.py')
+
+            if os.path.exists(updater_exe):
+                cmd = [updater_exe, '--auto']
+            elif os.path.exists(updater_py):
+                cmd = ['python', updater_py, '--auto']
             else:
                 self.textbox.insert('end', '❌ Updater not found\n', 'error')
                 return
@@ -229,7 +237,6 @@ class App(ctk.CTk):
             self.textbox.insert('end', '🔄 Updater started in separate window\n', 'orange')
             self.textbox.insert('end', '⏳ Bot will close in 5 seconds...\n', 'orange')
             self.textbox.see('end')
-            # Give updater time to start before UI closes itself
             self.after(5000, self.quit)
 
         except Exception as e:
