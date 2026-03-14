@@ -141,27 +141,31 @@ class App(ctk.CTk):
             try:
                 update_available, current, latest = VersionChecker.check_for_updates()
 
-                if latest:
-                    if update_available:
-                        self.textbox.insert('end', '⚠️ UPDATE AVAILABLE!\n', 'yellow')
-                        self.textbox.insert('end', f'Current version: {current}\n', 'warning')
-                        self.textbox.insert('end', f'Latest version: {latest}\n\n', 'yellow')
+                # Schedule UI updates on main thread
+                def update_ui():
+                    if latest:
+                        if update_available:
+                            self.textbox.insert('end', '⚠️ UPDATE AVAILABLE!\n', 'yellow')
+                            self.textbox.insert('end', f'Current version: {current}\n', 'warning')
+                            self.textbox.insert('end', f'Latest version: {latest}\n\n', 'yellow')
 
-                        notes = VersionChecker.get_release_notes(latest)
-                        if notes:
-                            self.textbox.insert('end', f'Version {latest} changes:\n', 'yellow')
-                            if len(notes) > 500:
-                                notes = notes[:500] + '...'
-                            self.textbox.insert('end', f'{notes}\n\n', 'warning')
+                            notes = VersionChecker.get_release_notes(latest)
+                            if notes:
+                                self.textbox.insert('end', f'Version {latest} changes:\n', 'yellow')
+                                if len(notes) > 500:
+                                    notes = notes[:500] + '...'
+                                self.textbox.insert('end', f'{notes}\n\n', 'warning')
 
-                        if self.config.getboolean('ADVANCED', 'autoupdate', fallback=False):
-                            self.textbox.insert('end', '🔄 Auto-update enabled, starting updater...\n\n', 'orange')
-                            self.after(2000, self._run_updater)
-                        else:
-                            self.textbox.insert('end', '💡 Run update.bat to update or download from:\n', 'blue')
-                            self.textbox.insert('end', f'{VersionChecker.get_download_url()}\n\n', 'blue')
-                else:
-                    self.textbox.insert('end', '⚠️ Could not check for updates\n\n', 'warning')
+                            if self.config.getboolean('ADVANCED', 'autoupdate', fallback=False):
+                                self.textbox.insert('end', '🔄 Auto-update enabled, starting updater...\n\n', 'orange')
+                                self.after(2000, self._run_updater)
+                            else:
+                                self.textbox.insert('end', '💡 Run update.bat to update or download from:\n', 'blue')
+                                self.textbox.insert('end', f'{VersionChecker.get_download_url()}\n\n', 'blue')
+                    else:
+                        self.textbox.insert('end', '⚠️ Could not check for updates\n\n', 'warning')
+
+                self.after(0, update_ui)
             except Exception as e:
                 logger.debug(f"Version check failed: {e}")
 
