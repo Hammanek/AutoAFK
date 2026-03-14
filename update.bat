@@ -17,7 +17,7 @@ if exist "AutoAFKUpdater.py.new" (
 
 REM Try compiled updater first (in _internal folder)
 if exist "_internal\AutoAFKUpdater.exe" (
-    _internal\AutoAFKUpdater.exe
+    _internal\AutoAFKUpdater.exe %*
     exit /b %ERRORLEVEL%
 )
 
@@ -41,13 +41,13 @@ if exist "_internal\AutoAFKUpdater.py" (
         python -m pip install requests --quiet
     )
     
-    python _internal\AutoAFKUpdater.py
+    python _internal\AutoAFKUpdater.py %*
     exit /b %ERRORLEVEL%
 )
 
 if exist "AutoAFKUpdater.py" (
     echo [INFO] Using Python updater
-    python AutoAFKUpdater.py
+    python AutoAFKUpdater.py %*
     exit /b %ERRORLEVEL%
 )
 

@@ -293,6 +293,9 @@ def restore_backup(backup_dir):
 def main():
     """Main updater function"""
     print_header()
+
+    # Parse arguments
+    auto_mode = '--auto' in sys.argv
     
     # Determine working directory
     # 1. If we are running as a frozen EXE
@@ -311,25 +314,28 @@ def main():
         print("[ERROR] Application not found!")
         print(f"[DEBUG] Current directory: {os.getcwd()}")
         print("[INFO] Please run updater from AutoAFK directory")
-        input("Press Enter to exit...")
+        if not auto_mode:
+            input("Press Enter to exit...")
         return 1
 
-
-    
     # Get latest release
     version, download_url = get_latest_release()
     if not version or not download_url:
-        input("Press Enter to exit...")
+        if not auto_mode:
+            input("Press Enter to exit...")
         return 1
     
-    # Confirm update
-    print()
-    print(f"Update to version {version}?")
-    print("[WARNING] Bot will be closed and restarted")
-    response = input("Continue? (y/n): ").lower()
-    if response != 'y':
-        print("[INFO] Update cancelled")
-        return 0
+    # Confirm update (skip in auto mode)
+    if not auto_mode:
+        print()
+        print(f"Update to version {version}?")
+        print("[WARNING] Bot will be closed and restarted")
+        response = input("Continue? (y/n): ").lower()
+        if response != 'y':
+            print("[INFO] Update cancelled")
+            return 0
+    else:
+        print(f"[AUTO] Updating to version {version}...")
     
     print()
     
@@ -341,20 +347,23 @@ def main():
         # Backup settings
         if not backup_settings(backup_dir):
             print("[ERROR] Backup failed, aborting update")
-            input("Press Enter to exit...")
+            if not auto_mode:
+                input("Press Enter to exit...")
             return 1
         
         # Download update
         zip_path = download_update(download_url, temp_dir)
         if not zip_path:
-            input("Press Enter to exit...")
+            if not auto_mode:
+                input("Press Enter to exit...")
             return 1
         
         # Extract update
         extract_dir = os.path.join(temp_dir, 'extracted')
         os.makedirs(extract_dir, exist_ok=True)
         if not extract_update(zip_path, extract_dir):
-            input("Press Enter to exit...")
+            if not auto_mode:
+                input("Press Enter to exit...")
             return 1
         
         # Close running bot
@@ -364,7 +373,8 @@ def main():
         if not install_update(extract_dir, backup_dir):
             print("[ERROR] Installation failed, restoring settings...")
             restore_backup(backup_dir)
-            input("Press Enter to exit...")
+            if not auto_mode:
+                input("Press Enter to exit...")
             return 1
         
         print()
@@ -377,17 +387,19 @@ def main():
         if restart_bot():
             print()
             print("[INFO] Update complete! Bot is starting...")
-            time.sleep(2)  # Give user time to see message
+            time.sleep(2)
         else:
             print()
             print("[INFO] Please start AutoAFK.exe manually")
-            input("Press Enter to exit...")
+            if not auto_mode:
+                input("Press Enter to exit...")
         
     except Exception as e:
         print(f"[ERROR] Update failed: {e}")
         print("[INFO] Restoring settings...")
         restore_backup(backup_dir)
-        input("Press Enter to exit...")
+        if not auto_mode:
+            input("Press Enter to exit...")
         return 1
     finally:
         # Cleanup temp directory
