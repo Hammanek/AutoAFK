@@ -209,66 +209,33 @@ class App(ctk.CTk):
         return tower_days.get(current_day, ["Campaign", "King's Tower"])
     
     def _run_updater(self) -> None:
-        """Run the updater as a detached process, stream output until bot is killed"""
-        def stream_updater():
-            try:
-                # Determine updater command
-                if os.path.exists('_internal/AutoAFKUpdater.exe'):
-                    cmd = ['_internal/AutoAFKUpdater.exe', '--auto']
-                elif os.path.exists('AutoAFKUpdater.py'):
-                    cmd = ['python', 'AutoAFKUpdater.py', '--auto']
-                else:
-                    self.textbox.insert('end', '❌ Updater not found\n', 'error')
-                    return
+        """Launch updater as a detached process with its own visible console window"""
+        try:
+            # Determine updater command
+            if os.path.exists('_internal/AutoAFKUpdater.exe'):
+                cmd = ['_internal/AutoAFKUpdater.exe', '--auto']
+            elif os.path.exists('AutoAFKUpdater.py'):
+                cmd = ['python', 'AutoAFKUpdater.py', '--auto']
+            else:
+                self.textbox.insert('end', '❌ Updater not found\n', 'error')
+                return
 
-                # Launch as detached process so it survives when UI is killed by updater
-                if sys.platform == 'win32':
-                    proc = subprocess.Popen(
-                        cmd,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        text=True,
-                        bufsize=1,
-                        creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
-                    )
-                else:
-                    proc = subprocess.Popen(
-                        cmd,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT,
-                        text=True,
-                        bufsize=1,
-                        start_new_session=True
-                    )
+            # Launch in a new visible console window, fully detached from this process
+            # CREATE_NEW_CONSOLE gives user a window to see progress
+            # CREATE_NEW_PROCESS_GROUP ensures it survives when AutoAFK.exe is killed
+            subprocess.Popen(
+                cmd,
+                creationflags=subprocess.CREATE_NEW_CONSOLE | subprocess.CREATE_NEW_PROCESS_GROUP
+            )
 
-                # Stream output until process ends or UI is killed
-                for line in proc.stdout:
-                    line = line.rstrip()
-                    if not line:
-                        continue
-                    if '[ERROR]' in line:
-                        tag = 'error'
-                    elif '[WARNING]' in line:
-                        tag = 'warning'
-                    elif '✓' in line or 'complete' in line.lower() or 'success' in line.lower():
-                        tag = 'green'
-                    else:
-                        tag = 'orange'
-                    try:
-                        self.textbox.insert('end', f'{line}\n', tag)
-                        self.textbox.see('end')
-                        self.update_idletasks()
-                    except Exception:
-                        break  # UI was destroyed (killed by updater)
+            self.textbox.insert('end', '🔄 Updater started in separate window\n', 'orange')
+            self.textbox.insert('end', '⏳ Bot will close in 3 seconds...\n', 'orange')
+            self.textbox.see('end')
+            # Give updater time to start before UI closes itself
+            self.after(3000, self.quit)
 
-            except Exception as e:
-                try:
-                    self.textbox.insert('end', f'❌ Failed to run updater: {e}\n', 'error')
-                except Exception:
-                    pass
-
-        self.textbox.insert('end', '🔄 Starting updater...\n\n', 'orange')
-        threading.Thread(target=stream_updater, daemon=True).start()
+        except Exception as e:
+            self.textbox.insert('end', f'❌ Failed to run updater: {e}\n', 'error')
         
     def _create_widgets(self) -> None:
         """Create all widgets - original layout"""
