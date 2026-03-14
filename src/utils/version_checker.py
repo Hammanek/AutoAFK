@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 import __main__
 CURRENT_VERSION = __main__.VERSION
 GITHUB_API_URL = __main__.GITHUB_API_URL
+GITHUB_REPO = __main__.GITHUB_REPO
 
 
 class VersionChecker:
