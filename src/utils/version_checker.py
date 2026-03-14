@@ -114,9 +114,8 @@ class VersionChecker:
             response.raise_for_status()
             
             data = response.json()
-            return data.get('body', 'No release notes available')
-        except Exception as e:
-            logger.error(f"Error getting release notes: {e}")
+            return data.get('body') or None
+        except Exception:
             return None
     
     @staticmethod
