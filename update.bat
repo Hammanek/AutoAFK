@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 REM AutoAFK Updater Launcher
 
 REM Check for self-updates and other staged files first
