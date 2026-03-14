@@ -209,18 +209,55 @@ class App(ctk.CTk):
         return tower_days.get(current_day, ["Campaign", "King's Tower"])
     
     def _run_updater(self) -> None:
-        """Run the updater script"""
-        try:
-            # Run update.bat for both compiled and source versions
-            if os.path.exists('update.bat'):
-                subprocess.Popen(['update.bat', '--auto'], shell=True)
-                self.textbox.insert('end', '🔄 Updater started, closing bot in 3 seconds...\n', 'orange')
-                # Wait 3 seconds to let updater start, then close
+        """Run the updater and stream its output to the textbox"""
+        def stream_updater():
+            try:
+                # Determine updater command
+                if os.path.exists('_internal/AutoAFKUpdater.exe'):
+                    cmd = ['_internal/AutoAFKUpdater.exe', '--auto']
+                elif os.path.exists('AutoAFKUpdater.py'):
+                    cmd = ['python', 'AutoAFKUpdater.py', '--auto']
+                else:
+                    self.textbox.insert('end', '❌ Updater not found\n', 'error')
+                    return
+
+                proc = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    text=True,
+                    bufsize=1
+                )
+
+                for line in proc.stdout:
+                    line = line.rstrip()
+                    if not line:
+                        continue
+                    if '[ERROR]' in line:
+                        tag = 'error'
+                    elif '[WARNING]' in line:
+                        tag = 'warning'
+                    elif '✓' in line or 'complete' in line.lower() or 'success' in line.lower():
+                        tag = 'green'
+                    else:
+                        tag = 'orange'
+                    self.textbox.insert('end', f'{line}\n', tag)
+                    self.textbox.see('end')
+                    self.update_idletasks()
+
+                proc.wait()
+                if proc.returncode == 0:
+                    self.textbox.insert('end', '\n✓ Update complete, closing...\n', 'green')
+                else:
+                    self.textbox.insert('end', '\n❌ Update failed\n', 'error')
+                self.textbox.see('end')
                 self.after(3000, self.quit)
-            else:
-                self.textbox.insert('end', '❌ update.bat not found\n', 'error')
-        except Exception as e:
-            self.textbox.insert('end', f'❌ Failed to start updater: {e}\n', 'error')
+
+            except Exception as e:
+                self.textbox.insert('end', f'❌ Failed to run updater: {e}\n', 'error')
+
+        self.textbox.insert('end', '🔄 Starting updater...\n\n', 'orange')
+        threading.Thread(target=stream_updater, daemon=True).start()
         
     def _create_widgets(self) -> None:
         """Create all widgets - original layout"""
