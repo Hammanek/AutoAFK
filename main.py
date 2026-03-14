@@ -209,7 +209,7 @@ class App(ctk.CTk):
         return tower_days.get(current_day, ["Campaign", "King's Tower"])
     
     def _run_updater(self) -> None:
-        """Run the updater and stream its output to the textbox"""
+        """Run the updater as a detached process, stream output until bot is killed"""
         def stream_updater():
             try:
                 # Determine updater command
@@ -221,14 +221,27 @@ class App(ctk.CTk):
                     self.textbox.insert('end', '❌ Updater not found\n', 'error')
                     return
 
-                proc = subprocess.Popen(
-                    cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    text=True,
-                    bufsize=1
-                )
+                # Launch as detached process so it survives when UI is killed by updater
+                if sys.platform == 'win32':
+                    proc = subprocess.Popen(
+                        cmd,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        bufsize=1,
+                        creationflags=subprocess.DETACHED_PROCESS | subprocess.CREATE_NEW_PROCESS_GROUP
+                    )
+                else:
+                    proc = subprocess.Popen(
+                        cmd,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT,
+                        text=True,
+                        bufsize=1,
+                        start_new_session=True
+                    )
 
+                # Stream output until process ends or UI is killed
                 for line in proc.stdout:
                     line = line.rstrip()
                     if not line:
@@ -241,20 +254,18 @@ class App(ctk.CTk):
                         tag = 'green'
                     else:
                         tag = 'orange'
-                    self.textbox.insert('end', f'{line}\n', tag)
-                    self.textbox.see('end')
-                    self.update_idletasks()
-
-                proc.wait()
-                if proc.returncode == 0:
-                    self.textbox.insert('end', '\n✓ Update complete, closing...\n', 'green')
-                else:
-                    self.textbox.insert('end', '\n❌ Update failed\n', 'error')
-                self.textbox.see('end')
-                self.after(3000, self.quit)
+                    try:
+                        self.textbox.insert('end', f'{line}\n', tag)
+                        self.textbox.see('end')
+                        self.update_idletasks()
+                    except Exception:
+                        break  # UI was destroyed (killed by updater)
 
             except Exception as e:
-                self.textbox.insert('end', f'❌ Failed to run updater: {e}\n', 'error')
+                try:
+                    self.textbox.insert('end', f'❌ Failed to run updater: {e}\n', 'error')
+                except Exception:
+                    pass
 
         self.textbox.insert('end', '🔄 Starting updater...\n\n', 'orange')
         threading.Thread(target=stream_updater, daemon=True).start()
