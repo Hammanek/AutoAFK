@@ -125,18 +125,12 @@ class BountyActivities(BaseActivity):
             for resource, image in bounty_types.items():
                 if self.image.is_visible(image, region=(30, button_y - 100, 140, 160), 
                                         suppress=True):
-                    # Check if we should dispatch this resource
+                    # Skip gold and soulstone (no config setting for these)
                     if resource not in ['gold', 'soulstone']:
                         if self.config.getboolean('BOUNTIES', f'dispatch{resource}', fallback=False):
                             logger.blue(f"Dispatching {resource.title()}")
                             self.controller.tap(900, button_y)
                             self.controller.tap(350, 1150)
                             self.controller.tap(750, 1150)
-                    else:
-                        # Always dispatch gold and soulstone
-                        logger.blue(f"Dispatching {resource.title()}")
-                        self.controller.tap(900, button_y)
-                        self.controller.tap(350, 1150)
-                        self.controller.tap(750, 1150)
                     break  # Move to next button
 
