@@ -80,7 +80,7 @@ class BountyActivities(BaseActivity):
                     
             # Refresh if not at max
             if refreshes < max_refreshes:
-                self.controller.tap(90, 250)
+                self.controller.tap(130, 300)
                 self.controller.tap(700, 1250)
                 
             refreshes += 1
