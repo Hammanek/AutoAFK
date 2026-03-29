@@ -175,51 +175,63 @@ class GameController:
         while self.image.is_visible('buttons/downarrow', confidence=0.8, suppress=True, click=True, retry=3):
             pass
             
-    def wait_until_game_active(self) -> None:
+    def wait_until_game_active(self) -> bool:
         """Wait for game to load and navigate to campaign"""
-        logger.info("Waiting for game to load...")
-        
-        # First quick check - if game is already loaded, return immediately
-        if self.image.is_visible('buttons/campaign_selected', suppress=True):
-            logger.info("Game already loaded and at campaign screen")
-            return True
-        
-        loading_counter = 0
-        timeout_counter = 0
-        max_timeout = 60
-        required_checks = 2  # Reduced from 3 to 2 for faster detection
-        
-        while loading_counter < required_checks:
-            # Clear popups
-            self.tap(420, 50, seconds=0)
-            
-            # Try back buttons
-            buttons = ['buttons/campaign_unselected', 'buttons/exitmenu_trial', 'buttons/back']
-            for button in buttons:
-                self.image.click_image(button, seconds=0, suppress=True)
-                
-            timeout_counter += 1
-            if timeout_counter > max_timeout:
-                logger.error("Timed out waiting for game to load")
-                return False
-                
-            # Check if campaign is visible
-            if self.image.is_visible('buttons/campaign_selected', suppress=True):
-                loading_counter += 1
-                if loading_counter >= required_checks:
-                    break  # Exit immediately when confirmed
+        for attempt in range(2):
+            if attempt > 0:
+                logger.warning(f"Retrying waiting for game to load (attempt {attempt + 1}/2)...")
+                self.wait(3)
             else:
-                # Reset counter if not visible (ensures consecutive detections)
-                loading_counter = 0
+                logger.info("Waiting for game to load...")
                 
-            # Clear time-limited deals
-            self.tap(540, 1900, seconds=0)
+            # First quick check - if game is already loaded, return immediately
+            if self.image.is_visible('buttons/campaign_selected', suppress=True):
+                logger.info("Game already loaded and at campaign screen")
+                return True
             
-            # Small wait between checks to avoid hammering
-            self.wait(0.5)
+            loading_counter = 0
+            timeout_counter = 0
+            max_timeout = 60
+            required_checks = 1  # Reduced from 2 to 1 for faster detection in retry
+            success = False
             
-        logger.info("Game loaded successfully")
-        return True
+            while loading_counter < required_checks:
+                # Clear popups
+                self.tap(420, 50, seconds=0)
+                
+                # Try back buttons
+                buttons = ['buttons/campaign_unselected', 'buttons/exitmenu_trial', 'buttons/back']
+                for button in buttons:
+                    self.image.click_image(button, seconds=0, suppress=True)
+                    
+                timeout_counter += 1
+                if timeout_counter > max_timeout:
+                    logger.warning(f"Timeout reached for loading attempt {attempt + 1}")
+                    break
+                    
+                # Check if campaign is visible
+                if self.image.is_visible('buttons/campaign_selected', suppress=True):
+                    loading_counter += 1
+                    if loading_counter >= required_checks:
+                        success = True
+                        break  # Exit immediately when confirmed
+                else:
+                    # Reset counter if not visible (ensures consecutive detections)
+                    loading_counter = 0
+                    
+                # Clear time-limited deals
+                self.tap(540, 1900, seconds=0)
+                
+                # Small wait between checks to avoid hammering
+                self.wait(0.5)
+            
+            if success:
+                logger.info("Game loaded successfully")
+                return True
+        
+        # If we reach here, both attempts failed
+        logger.critical("Fatal: Game failed to load or reach campaign screen after 2 attempts.")
+        raise RuntimeError("Game loading failure. Shutting down to prevent loops.")
         
     def select_opponent(self, choice: int = 1, hoe: bool = False) -> bool:
         """Select arena opponent by position (1-5)"""

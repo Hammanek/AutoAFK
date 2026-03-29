@@ -85,7 +85,8 @@ class CampaignActivities(BaseActivity):
                                                    region=(24, 1419, 119, 104)):
                         # Something went wrong
                         logger.error("AutoBattle screen not found, reloading auto-push...")
-                        self.controller.recover()
+                        if not self.controller.recover():
+                            raise RuntimeError("Recovery failed during campaign push. Shutting down.")
         
         logger.green("Campaign push complete")
         return True

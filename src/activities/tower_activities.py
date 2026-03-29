@@ -198,7 +198,7 @@ class TowerActivities(BaseActivity):
                         # Reopen tower
                         tower_open = False
                     else:
-                        return False
+                        raise RuntimeError("Recovery failed during tower push. Shutting down.")
         
         logger.green("Tower push complete")
         return True

@@ -130,7 +130,7 @@ class GuildActivities(BaseActivity):
             # Soren activation (specific days)
             days_str = self.config.get('DAILIES', 'sorenactivate_days', fallback='1,2,3,4,5,6,7')
             activate_days = [int(day.strip()) for day in days_str.split(',')]
-            current_day = datetime.now(timezone.utc).isoweekday()
+            current_day = datetime.now().isoweekday()  # Local time, same as old version
             
             if (self.config.getboolean('DAILIES', 'sorenactivate', fallback=False) and 
                 current_day in activate_days):

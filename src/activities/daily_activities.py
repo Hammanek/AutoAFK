@@ -272,7 +272,7 @@ class DailyActivities(BaseActivity):
                 self.controller.tap(550, 1800, seconds=0)
                 crash_counter += 1
                 if crash_counter > 30:
-                    logger.error("Something went wrong (normally gear chests being selected), returning...")
+                    logger.error("Something went wrong, returning...")
                     self.image.click_image('buttons/back', region=self.controller.BOUNDARIES['backMenu'])
                     self.image.click_image('buttons/back', region=self.controller.BOUNDARIES['backMenu'])
                     return False
@@ -309,7 +309,7 @@ class DailyActivities(BaseActivity):
                 self.controller.tap(520, 1860)
             logger.green("Leveled up successfully")
         else:
-            logger.warning("Not enough dust to level up")
+            logger.warning("Level up not available")
             
         self.controller.recover(silent=True)
         return True
