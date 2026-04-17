@@ -43,6 +43,13 @@ Double-click `AutoAFK.exe`
 - ADB is included in the release package
 - No Python required (fully compiled)
 
+## How do I run it?
+Configure your Android emulator so that:
+* ADB is enabled
+* Resolution is 1920x1080
+* DPI is 240
+* AFK's language is set to English
+
 ## Configuration
 
 Edit `settings.ini`:
